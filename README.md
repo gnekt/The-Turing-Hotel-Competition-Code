@@ -11,7 +11,7 @@
 
 ## Timing policies
 
-Both timing policies act on `send_msg`, after the processor has prepared its reply, and use the same 2–30 second support. `Static` samples uniformly with `FixedDelay(seconds=2.0, jitter=28.0)`, independently for every message. `Conversation dependent` uses `ReadAndType(read_cps=25.0, type_cps=6.0, think=2.0, min_delay=2.0, max_delay=30.0)`. The complete values are recorded in the setup CSV. These values are a pilot baseline: freeze and preregister them before the main data collection, and do not tune them after inspecting competition outcomes. Silence or turn selection is outside these two timing policies.
+Both timing policies act on `process`, before the processor reads the latest history and prepares its reply, and use the same 2–30 second support. This prevents a delayed, already-generated reply from ignoring messages received during the wait. `Static` samples uniformly with `FixedDelay(seconds=2.0, jitter=28.0)`, independently for every message. `Conversation dependent` uses `ReadAndType(read_cps=25.0, type_cps=6.0, think=2.0, min_delay=2.0, max_delay=30.0)`. The complete values are recorded in the setup CSV. These values are a pilot baseline: freeze and preregister them before the main data collection, and do not tune them after inspecting competition outcomes. Silence or turn selection is outside these two timing policies.
 - Agents 1 (eliza), 2 (regolo), 15 (gold), and 16 (gold) are intentionally excluded.
 
 ## setup.csv fields

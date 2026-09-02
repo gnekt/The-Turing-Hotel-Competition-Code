@@ -1,4 +1,4 @@
-"""Delay a prepared message by reading, thinking and typing time."""
+"""Delay each generation by reading, thinking and typing time."""
 
 import random
 import time
@@ -6,7 +6,7 @@ import time
 
 class ReadAndType:
     def __init__(self, read_cps=25.0, type_cps=6.0, think=2.0,
-                 min_delay=2.0, max_delay=30.0, actions=("send_msg",)):
+                 min_delay=2.0, max_delay=30.0, actions=("process",)):
         self.read_cps = read_cps
         self.type_cps = type_cps
         self.think = think

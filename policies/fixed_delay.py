@@ -1,11 +1,11 @@
-"""Delay every prepared message by a fixed interval plus uniform jitter."""
+"""Delay each generation by a fixed interval plus uniform jitter."""
 
 import random
 import time
 
 
 class FixedDelay:
-    def __init__(self, seconds=6.0, jitter=2.0, actions=("send_msg",)):
+    def __init__(self, seconds=6.0, jitter=2.0, actions=("process",)):
         self.seconds = seconds
         self.jitter = jitter
         self.actions = set(actions)

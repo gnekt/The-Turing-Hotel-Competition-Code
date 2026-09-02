@@ -34,19 +34,10 @@ def _personas():
 
 def build_system_prompt(config):
     """Combine the shared human behaviour with the agent's optional persona."""
-    public_name = config.get("agent_name", "").strip()
-    public_identity = ""
-    if public_name:
-        public_identity = (
-            "\n\n## Identità pubblica\n\n"
-            f"Il tuo nome visibile nella chat è {public_name}. Puoi usare questo nome; "
-            "non sostituirlo mai con il nome contenuto nel profilo privato."
-        )
-
     persona_id = config.get("persona_id", "").strip()
     if not persona_id:
         details = "\n".join(f"- {label}: Not defined" for _, label in PERSONA_FIELDS)
-        return f"{_human_behaviour()}{public_identity}\n\n## Profilo privato — non divulgare\n\n{details}"
+        return f"{_human_behaviour()}\n\n## Profilo privato — non divulgare\n\n{details}"
 
     try:
         persona = _personas()[persona_id]
@@ -54,4 +45,4 @@ def build_system_prompt(config):
         raise ValueError(f"Unknown persona_id: {persona_id}") from error
 
     details = "\n".join(f"- {label}: {persona[field]}" for field, label in PERSONA_FIELDS)
-    return f"{_human_behaviour()}{public_identity}\n\n## Profilo privato — non divulgare\n\n{details}"
+    return f"{_human_behaviour()}\n\n## Profilo privato — non divulgare\n\n{details}"
