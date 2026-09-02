@@ -1,0 +1,61 @@
+id,agent_name,competition_agnostic,llm,model_id,featherless_model_key,model_capacity,parameter_count,concurrency_cost,model_details,policy_type,policy_details,persona_info,persona_id,prompt_variant,design_cell,replicate_id,design_seed
+100001,Neo,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,GL_S_P,1,20261000
+100002,Jax,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,QL_S_P,1,20261000
+100003,Mouse,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,C_S_P,1,20261000
+100004,Manabu,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,C_C_P,3,20261000
+100005,DeusExMachina,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GS_C_N,3,20261000
+100006,Apoc,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,C_C_P,1,20261000
+100007,Bugs,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,QL_C_P,3,20261000
+100008,Vector,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,GS_C_P,2,20261000
+100009,Kid,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QL_S_N,2,20261000
+100010,Persephone,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P5,persona,GL_C_P,2,20261000
+100011,Soren,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,GS_S_P,3,20261000
+100012,Binary,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GS_S_N,1,20261000
+100013,Rhineheart,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,QS_C_P,2,20261000
+100014,Pudgy,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P5,persona,C_C_P,2,20261000
+100015,Lock,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P3,persona,QL_C_P,2,20261000
+100016,Sati,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,QL_S_P,2,20261000
+100017,Roland,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,GL_C_P,3,20261000
+100018,Axel,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,C_C_N,2,20261000
+100019,Duo,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QS_C_N,2,20261000
+100020,Dozer,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QS_C_N,1,20261000
+100021,AgentBrown,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,GL_S_P,2,20261000
+100022,Cas,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,GS_C_P,1,20261000
+100023,Tank,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P4,persona,QS_C_P,1,20261000
+100024,Tom,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,C_S_N,2,20261000
+100025,Oracle,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona,QS_S_P,1,20261000
+100026,Keymaker,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QL_S_N,1,20261000
+100027,Analyst,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QL_C_N,2,20261000
+100028,AgentJones,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,C_C_N,1,20261000
+100029,DuJour,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QS_S_N,2,20261000
+100030,Yoko,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,C_S_N,3,20261000
+100031,Zee,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P3,persona,GS_C_P,3,20261000
+100032,Masa,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,QS_S_P,2,20261000
+100033,Morpheus,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,GL_C_P,1,20261000
+100034,Maggie,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QL_C_N,1,20261000
+100035,Merovingian,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,GL_S_P,3,20261000
+100036,TwinOne,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GS_S_N,2,20261000
+100037,Kaiser,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QS_C_N,3,20261000
+100038,TwinTwo,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GS_S_N,3,20261000
+100039,Jue,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QL_C_N,3,20261000
+100040,Link,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,QL_C_P,1,20261000
+100041,Niobe,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GL_S_N,3,20261000
+100042,Trinity,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GL_S_N,1,20261000
+100043,Ballard,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,GS_S_P,1,20261000
+100044,Sparks,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,QL_S_P,3,20261000
+100045,Trainman,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QL_S_N,3,20261000
+100046,Choi,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GL_C_N,2,20261000
+100047,Architect,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona,C_S_P,2,20261000
+100048,Seraph,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GL_C_N,3,20261000
+100049,AgentSmith,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GL_C_N,1,20261000
+100050,Misha,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,C_C_N,3,20261000
+100051,Sara,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P2,persona,QS_S_P,3,20261000
+100052,Bane,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,GS_S_P,2,20261000
+100053,Thadeus,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QS_S_N,3,20261000
+100054,Switch,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,C_S_N,1,20261000
+100055,Ghost,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GS_C_N,1,20261000
+100056,Cis,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P3,persona,QS_C_P,3,20261000
+100057,Cypher,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QS_S_N,1,20261000
+100058,CouncillorHamann,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GS_C_N,2,20261000
+100059,Dan,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,C_S_P,3,20261000
+100060,Mifune,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GL_S_N,2,20261000

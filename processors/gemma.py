@@ -40,7 +40,7 @@ def build(
     temperature: float = 1.0,
     api_key: str = "",
 ) -> FeatherlessAPI:
-    """Build Gemma 4 with per-turn thinking and answer-only text output.
+    """Build a Gemma 4 model with per-turn thinking and answer-only text output.
 
     The gateway returns only ``message.content`` and discards a separate
     reasoning field. Gemma's model card also says that thoughts from ordinary
@@ -61,7 +61,8 @@ def build(
 
 
 class GemmaAgent:
-    def __init__(self, personas: str, effort: str, api_key: str):
+    def __init__(self, personas: str, effort: str, api_key: str,
+                 model: str = "google/gemma-4-31B-it", cost: int = 2):
         self.conversation = Conversation(keep=100)
         self.conv = self.conversation
         self.personas = personas
@@ -69,7 +70,7 @@ class GemmaAgent:
         # provider-level reasoning_effort values. Keep the common constructor
         # argument without sending an unsupported API parameter.
         self.effort = effort
-        self.api = build(system_prompt=personas, api_key=api_key)
+        self.api = build(model=model, cost=cost, system_prompt=personas, api_key=api_key)
 
     def __call__(self, message: str) -> str:
         self.conversation.add(message)

@@ -31,7 +31,7 @@ def build(
     temperature: float = 0.6,
     api_key: str = "",
 ) -> FeatherlessAPI:
-    """Build Qwen3-0.6B with thinking enabled and answer-only output.
+    """Build a Qwen 3 model with thinking enabled and answer-only output.
 
     ``FeatherlessAPI`` already returns only ``message.content``; the separate
     ``reasoning_content`` field is discarded inside the gateway. Qwen3 also
@@ -53,14 +53,15 @@ def build(
 
 
 class QwenAgent:
-    def __init__(self, personas: str, effort: str, api_key: str):
+    def __init__(self, personas: str, effort: str, api_key: str,
+                 model: str = "Qwen/Qwen3-0.6B", cost: int = 1):
         self.conversation = Conversation(keep=100)
         self.conv = self.conversation
         self.personas = personas
-        # Qwen3-0.6B exposes a binary thinking switch, not reasoning-effort
+        # Qwen 3 exposes a binary thinking switch, not reasoning-effort
         # levels. Keep the shared constructor argument for interface parity.
         self.effort = effort
-        self.api = build(system_prompt=personas, api_key=api_key)
+        self.api = build(model=model, cost=cost, system_prompt=personas, api_key=api_key)
 
     def __call__(self, message: str) -> str:
         self.conversation.add(message)

@@ -22,18 +22,49 @@ from prompts import build_system_prompt
 
 
 WORLD = "jolly-mayer/TuringHotelItaly"
-SETUP_FILE = Path(__file__).with_name("christian_compt_setup.csv")
-LOGS_DIR = Path(__file__).with_name("logs")
+ROOT = Path(__file__).parent
+SETUP_FILE = ROOT / "christian_compt_setup.csv"
+LOGS_DIR = ROOT / "logs"
+
+
+def model_id_for(config):
+    model_id = config.get("model_id", "").strip()
+    if model_id:
+        return model_id
+    if config["llm"].startswith("Gemma"):
+        return "google/gemma-4-31B-it"
+    if config["llm"].startswith("Qwen"):
+        return "Qwen/Qwen3-0.6B"
+    return "opus"
+
+
+def node_name_for(config):
+    agent_name = config["agent_name"] or f"MyGuest{config['id']}"
+    return f"{agent_name} ({model_id_for(config)})"
 
 
 def run_agent(config, featherless_key, unaiverse_key):
     llm = config["llm"]
     prompt = build_system_prompt(config)
+    model_id = model_id_for(config)
+    cost_value = config.get("concurrency_cost", "").strip()
 
     if llm.startswith("Gemma"):
-        processor = GemmaAgent(prompt, "medium", featherless_key)
+        processor = GemmaAgent(
+            prompt,
+            "medium",
+            featherless_key,
+            model=model_id or "google/gemma-4-31B-it",
+            cost=int(cost_value or 2),
+        )
     elif llm.startswith("Qwen"):
-        processor = QwenAgent(prompt, "medium", featherless_key)
+        processor = QwenAgent(
+            prompt,
+            "medium",
+            featherless_key,
+            model=model_id or "Qwen/Qwen3-0.6B",
+            cost=int(cost_value or 1),
+        )
     else:
         processor = OpusAgent(prompt, "medium")
 
@@ -46,7 +77,7 @@ def run_agent(config, featherless_key, unaiverse_key):
     node = Node(
         hosted=agent,
         unaiverse_key=unaiverse_key,
-        node_name=config["agent_name"] or f"MyGuest{config['id']}",
+        node_name=node_name_for(config),
         hidden=True,
         clock_delta=1.0 / 10.0,
     )
@@ -66,7 +97,7 @@ def session_is_running(session_name):
 
 
 def stop_agent(config):
-    node_name = config["agent_name"] or f"MyGuest{config['id']}"
+    node_name = node_name_for(config)
     session_name = f"competition_agent_{config['id']}"
 
     if not session_is_running(session_name):
@@ -86,8 +117,8 @@ def stop_agent(config):
     return True
 
 
-def launch_agent(config, featherless_key, unaiverse_key):
-    node_name = config["agent_name"] or f"MyGuest{config['id']}"
+def launch_agent(config, featherless_key, unaiverse_key, setup_file=SETUP_FILE):
+    node_name = node_name_for(config)
     session_name = f"competition_agent_{config['id']}"
     log_file = LOGS_DIR / f"agent_{config['id']}.log"
 
@@ -99,6 +130,7 @@ def launch_agent(config, featherless_key, unaiverse_key):
     env["COMPETITION_AGENT_ID"] = config["id"]
     env["COMPETITION_UNAIVERSE_KEY"] = unaiverse_key
     env["COMPETITION_LOG_FILE"] = str(log_file)
+    env["COMPETITION_SETUP_FILE"] = str(Path(setup_file).resolve())
     env["NODE_IGNORE_ALIVE"] = "1"
     if featherless_key:
         env["COMPETITION_FEATHERLESS_KEY"] = featherless_key
@@ -111,9 +143,9 @@ def launch_agent(config, featherless_key, unaiverse_key):
             sys.executable,
             "-u",
             "-m",
-            "tui_launcher.agent_runner",
+            "agent_runner",
         ],
-        cwd=SETUP_FILE.parent,
+        cwd=ROOT,
         env=env,
         capture_output=True,
         text=True,
@@ -135,19 +167,22 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("featherless_keys_file")
     parser.add_argument("unaiverse_key")
+    parser.add_argument("--setup", type=Path, default=SETUP_FILE)
     args = parser.parse_args()
+
+    setup_file = args.setup.expanduser().resolve()
 
     with open(args.featherless_keys_file, encoding="utf-8") as file:
         keys = cycle(line.strip() for line in file if line.strip())
 
-    with SETUP_FILE.open(newline="", encoding="utf-8") as file:
+    with setup_file.open(newline="", encoding="utf-8") as file:
         configs = list(csv.DictReader(file))
 
     LOGS_DIR.mkdir(exist_ok=True)
     started = 0
     for index, config in enumerate(configs):
         key = next(keys) if config["featherless_model_key"] != "NA" else None
-        started += launch_agent(config, key, args.unaiverse_key)
+        started += launch_agent(config, key, args.unaiverse_key, setup_file)
         if index < len(configs) - 1:
             time.sleep(16)
 
