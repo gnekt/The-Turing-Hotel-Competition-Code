@@ -1,0 +1,43 @@
+# Runtime output
+logs/
+*.log
+
+# Tests kept locally for development
+tests/
+
+# Python caches and build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*_key.txt
+*_keys.txt
+*.pem
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+*~
+*.swp
+
+# Local copies
+* copy.csv

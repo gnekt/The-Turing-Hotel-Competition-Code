@@ -1,0 +1,13 @@
+id,agent_name,competition_agnostic,llm,featherless_model_key,model_capacity,model_details,policy_type,policy_details,persona_info,persona_id,prompt_variant
+3,Aldo,yes,Gemma (chatB_2),chatB_2,Large,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=send_msg),yes,P1,persona
+4,Giovanni,yes,Gemma (chatB_2),chatB_2,Large,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=send_msg),no,,no_persona
+5,Giacomo,yes,Gemma (chatC_2),chatC_2,Large,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=send_msg),yes,P2,persona
+6,Tafazzi,yes,Gemma (chatC_2),chatC_2,Large,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=send_msg),no,,no_persona
+7,JohnnyStecchino,yes,Qwen (chatA_1),chatA_1,Small,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=send_msg),yes,P3,persona
+8,Fantozzi,yes,Qwen (chatA_1),chatA_1,Small,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=send_msg),no,,no_persona
+9,Filini,yes,Qwen (chatA_1),chatA_1,Small,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=send_msg),yes,P4,persona
+10,CettoLaQualunque,yes,Qwen (chatA_1),chatA_1,Small,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=send_msg),no,,no_persona
+11,Furio,yes,Claude Opus,NA,Large,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=send_msg),yes,P5,persona
+12,Mimmo,yes,Claude Opus,NA,Large,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=send_msg),no,,no_persona
+13,Loris,yes,Claude Opus,NA,Large,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=send_msg),yes,P6,persona
+14,JepGambardella,yes,Claude Opus,NA,Large,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=send_msg),no,,no_persona
