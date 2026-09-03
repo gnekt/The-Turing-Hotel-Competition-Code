@@ -2,8 +2,6 @@
 logs/
 *.log
 
-# Optional local launcher interface
-tui_launcher/
 
 # Tests kept locally for development
 tests/
