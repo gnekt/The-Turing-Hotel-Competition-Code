@@ -6,6 +6,7 @@ from utils import (
     Conversation,
     EXPERIMENT_RESPONSE_RESERVE_TOKENS,
     model_context_tokens,
+    single_text_output,
 )
 
 
@@ -79,7 +80,7 @@ class QwenAgent:
             self.conversation.add(message)
             prompt = self.conversation.as_messages()
             prompt_text = "\n".join(f"{item['role']}: {item['content']}" for item in prompt)
-            response = _answer_only(self.api(prompt_text))
+            response = _answer_only(single_text_output(self.api(prompt_text)))
             self.conversation.remember(response)
             return response
         except Exception as error:

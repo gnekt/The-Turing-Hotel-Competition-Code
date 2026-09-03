@@ -58,6 +58,17 @@ def model_context_tokens(model: str) -> int:
 Message = namedtuple("Message", "speaker text mine")
 
 
+def single_text_output(output) -> str:
+    """Return the text emitted by a one-output UNaIVERSE module."""
+    if isinstance(output, tuple):
+        if len(output) != 1:
+            raise TypeError(f"Expected one processor output, received {len(output)}")
+        output = output[0]
+    if not isinstance(output, str):
+        raise TypeError(f"Expected a text processor output, got {type(output).__name__}")
+    return output
+
+
 class Conversation:
     """Keep the first received event and rotate every later event in `keep - 1` slots.
 

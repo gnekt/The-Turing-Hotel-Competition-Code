@@ -1,8 +1,8 @@
 # Runtime output
 logs/
 *.log
-
-
+account_key
+FEATHERLESS_API_KEYS
 # Tests kept locally for development
 tests/
 
