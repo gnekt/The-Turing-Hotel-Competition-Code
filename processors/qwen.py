@@ -2,10 +2,15 @@ import re
 
 from unaiverse.modules.networks import FeatherlessAPI
 
-from utils import Conversation
+from utils import (
+    Conversation,
+    EXPERIMENT_RESPONSE_RESERVE_TOKENS,
+    model_context_tokens,
+)
 
 
 THINKING_BLOCK = re.compile(r"<think>.*?</think>\s*", re.DOTALL | re.IGNORECASE)
+MAX_OUTPUT_TOKENS = EXPERIMENT_RESPONSE_RESERVE_TOKENS
 
 
 def _answer_only(response: str) -> str:
@@ -27,7 +32,7 @@ def build(
     model: str = "Qwen/Qwen3-0.6B",
     cost: int = 1,
     system_prompt: str = "",
-    max_tokens: int = 32768,
+    max_tokens: int = MAX_OUTPUT_TOKENS,
     temperature: float = 0.6,
     api_key: str = "",
 ) -> FeatherlessAPI:
@@ -55,7 +60,12 @@ def build(
 class QwenAgent:
     def __init__(self, personas: str, effort: str, api_key: str,
                  model: str = "Qwen/Qwen3-0.6B", cost: int = 1):
-        self.conversation = Conversation(keep=100)
+        self.conversation = Conversation(
+            keep=100,
+            context_window_tokens=model_context_tokens(model),
+            response_reserve_tokens=MAX_OUTPUT_TOKENS,
+            system_prompt=personas,
+        )
         self.conv = self.conversation
         self.personas = personas
         # Qwen 3 exposes a binary thinking switch, not reasoning-effort

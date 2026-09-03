@@ -10,6 +10,8 @@ from prompt_toolkit.shortcuts import (
 )
 from prompt_toolkit.styles import Style
 
+from tui_launcher.dashboard import show_dashboard
+
 from run import (
     LOGS_DIR,
     ROOT,
@@ -66,6 +68,7 @@ def choose_action():
         text="Cosa vuoi fare?",
         values=[
             ("launch", "Lancia agenti"),
+            ("monitor", "Monitora conversazioni"),
             ("stop", "Termina agenti"),
         ],
         default="launch",
@@ -217,6 +220,9 @@ def main():
         return
     configs = load_configs(setup_file)
     action = choose_action()
+    if action == "monitor":
+        show_dashboard(configs, setup_file)
+        return
     if action == "stop":
         stop_agents(configs)
         return

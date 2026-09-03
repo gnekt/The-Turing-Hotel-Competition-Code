@@ -2,7 +2,11 @@ import re
 
 from unaiverse.modules.networks import FeatherlessAPI
 
-from utils import Conversation
+from utils import (
+    Conversation,
+    EXPERIMENT_RESPONSE_RESERVE_TOKENS,
+    model_context_tokens,
+)
 
 
 THINK_TOKEN = "<|think|>"
@@ -36,7 +40,7 @@ def build(
     model: str = "google/gemma-4-31B-it",
     cost: int = 2,
     system_prompt: str = "",
-    max_tokens: int = 4096,
+    max_tokens: int = EXPERIMENT_RESPONSE_RESERVE_TOKENS,
     temperature: float = 1.0,
     api_key: str = "",
 ) -> FeatherlessAPI:
@@ -63,7 +67,12 @@ def build(
 class GemmaAgent:
     def __init__(self, personas: str, effort: str, api_key: str,
                  model: str = "google/gemma-4-31B-it", cost: int = 2):
-        self.conversation = Conversation(keep=100)
+        self.conversation = Conversation(
+            keep=100,
+            context_window_tokens=model_context_tokens(model),
+            response_reserve_tokens=EXPERIMENT_RESPONSE_RESERVE_TOKENS,
+            system_prompt=personas,
+        )
         self.conv = self.conversation
         self.personas = personas
         # The supplied Gemma 4 card documents binary thinking control, but no

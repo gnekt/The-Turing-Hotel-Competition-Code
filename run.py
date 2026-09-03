@@ -29,6 +29,7 @@ SETUP_FILES = {
     "100": ROOT / "christian_compt_setup_100_humans.csv",
 }
 LOGS_DIR = ROOT / "logs"
+STATE_DIR = LOGS_DIR / "state"
 ACCOUNT_KEY_FILE = ROOT / "account_key"
 DEFAULT_MODEL_IDS = {
     "Gemma 4 31B": "google/gemma-4-31B-it",
@@ -111,6 +112,10 @@ def node_name_for(config):
     return f"{agent_name} ({short_model_id})"
 
 
+def state_file_for(config):
+    return STATE_DIR / f"agent_{config['id']}.json"
+
+
 def run_agent(config, featherless_key, unaiverse_key):
     llm = config["llm"]
     prompt = build_system_prompt(config)
@@ -152,16 +157,21 @@ def run_agent(config, featherless_key, unaiverse_key):
     node.run(join_world=WORLD)
 
 
-def session_is_running(session_name):
+def running_session_names():
     result = subprocess.run(["screen", "-ls"], capture_output=True, text=True)
+    names = set()
     for line in result.stdout.splitlines():
         fields = line.strip().split()
         if not fields or "." not in fields[0]:
             continue
         name = fields[0].split(".", 1)[1]
-        if name == session_name and ("(Detached)" in line or "(Attached)" in line):
-            return True
-    return False
+        if "(Detached)" in line or "(Attached)" in line:
+            names.add(name)
+    return names
+
+
+def session_is_running(session_name):
+    return session_name in running_session_names()
 
 
 def stop_agent(config):
@@ -189,6 +199,7 @@ def launch_agent(config, featherless_key, unaiverse_key, setup_file=SETUP_FILE):
     node_name = node_name_for(config)
     session_name = f"competition_agent_{config['id']}"
     log_file = LOGS_DIR / f"agent_{config['id']}.log"
+    state_file = state_file_for(config)
 
     if session_is_running(session_name):
         print(f"{node_name} è già attivo nella sessione {session_name}.", flush=True)
@@ -198,10 +209,14 @@ def launch_agent(config, featherless_key, unaiverse_key, setup_file=SETUP_FILE):
     env["COMPETITION_AGENT_ID"] = config["id"]
     env["COMPETITION_UNAIVERSE_KEY"] = unaiverse_key
     env["COMPETITION_LOG_FILE"] = str(log_file)
+    env["COMPETITION_STATE_FILE"] = str(state_file)
     env["COMPETITION_SETUP_FILE"] = str(Path(setup_file).resolve())
     env["NODE_IGNORE_ALIVE"] = "1"
     if featherless_key:
         env["COMPETITION_FEATHERLESS_KEY"] = featherless_key
+
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    state_file.unlink(missing_ok=True)
 
     result = subprocess.run(
         [

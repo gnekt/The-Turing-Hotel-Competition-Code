@@ -3,10 +3,12 @@ this file is part of the Turing Hotel competition codebase, and contains utility
 """
 
 import json
+import os
 import re
+import time
 from collections import namedtuple
+from pathlib import Path
 import subprocess
-from sys import exception
 
 
 EVENT_SEPARATOR = "\x1e"
@@ -30,6 +32,26 @@ def reset_on_phrase(event: str) -> bool:
 
 DEFAULT_RESET_RULES = (reset_on_phrase,)
 
+EXPERIMENT_CONTEXT_TOKENS = 32_768
+EXPERIMENT_RESPONSE_RESERVE_TOKENS = 8_192
+MODEL_CONTEXT_TOKENS = {
+    # One common ceiling prevents context capacity from becoming an additional
+    # model-family confound. It is the largest value supported by every runtime.
+    "Qwen/Qwen3-0.6B": EXPERIMENT_CONTEXT_TOKENS,
+    "Qwen/Qwen3-32B": EXPERIMENT_CONTEXT_TOKENS,
+    "google/gemma-4-E2B-it": EXPERIMENT_CONTEXT_TOKENS,
+    "google/gemma-4-31B-it": EXPERIMENT_CONTEXT_TOKENS,
+    "Claude Opus": EXPERIMENT_CONTEXT_TOKENS,
+}
+CONTEXT_TEMPLATE_RESERVE_TOKENS = 512
+
+
+def model_context_tokens(model: str) -> int:
+    try:
+        return MODEL_CONTEXT_TOKENS[model]
+    except KeyError as error:
+        raise ValueError(f"Unknown context window for model: {model}") from error
+
 # speaker: sender name, or "" for an event with no name
 # text:    event body with surrounding whitespace removed
 # mine:    True when remember() stored the reply
@@ -37,11 +59,14 @@ Message = namedtuple("Message", "speaker text mine")
 
 
 class Conversation:
-    """Keep one fixed first message and a rotating tail of `keep - 1` messages.
+    """Keep the first received event and rotate every later event in `keep - 1` slots.
 
     This retention policy is the starter kit's choice. It is not prescribed by
     the world, and competitors are free to implement conversation state in a
     different way, including by exploiting the demo inputs under ``prompts/``.
+    Only the very first event is privileged: later manager messages, reset
+    messages, participant messages, and local replies all share the same
+    rotating tail.
 
     Args:
         keep: Total number of messages to retain, or 0 for no limit. The first
@@ -53,6 +78,12 @@ class Conversation:
         reset_rules: Callables that receive one raw event and return True when
             the rotating tail should be cleared. By default, common Italian and
             English requests to start a new conversation or clear context match.
+        context_window_tokens: Maximum combined model context. Zero disables
+            context-aware rotation.
+        response_reserve_tokens: Context reserved for the next generation.
+        system_prompt: Fixed prompt counted against the context budget.
+        snapshot_file: Optional local JSON path used by read-only monitors. When
+            omitted, ``COMPETITION_STATE_FILE`` is used if the launcher set it.
 
     A reset rule can be a simple heuristic, a regular-expression wrapper or a
     neural classifier. Conversation does not know which world produced the
@@ -61,7 +92,9 @@ class Conversation:
     """
 
     def __init__(self, keep: int = 80, speaker_pattern: str = SPEAKER, me: str = "Io",
-                 reset_rules=DEFAULT_RESET_RULES):
+                 reset_rules=DEFAULT_RESET_RULES, snapshot_file=None,
+                 context_window_tokens: int = 0, response_reserve_tokens: int = 0,
+                 system_prompt: str = ""):
         self.keep = keep
         self.pattern = re.compile(speaker_pattern, re.S)
         self.me = me
@@ -69,9 +102,19 @@ class Conversation:
         self.history: list[Message] = []
         self.last_input = ""
         self.last_output = ""
+        self.context_window_tokens = context_window_tokens
+        self.response_reserve_tokens = response_reserve_tokens
+        self.system_prompt = system_prompt
+        configured_snapshot = snapshot_file or os.environ.get("COMPETITION_STATE_FILE")
+        self.snapshot_file = Path(configured_snapshot) if configured_snapshot else None
+        self._publish_snapshot()
 
     def reset(self) -> None:
         """Clear the rotating slots while preserving the first message."""
+        self._clear_tail()
+        self._publish_snapshot()
+
+    def _clear_tail(self) -> None:
         self.history[:] = self.history[:1]
         self.last_input = ""
         self.last_output = ""
@@ -92,7 +135,7 @@ class Conversation:
 
             # Clear the rotating tail first; the trigger is stored below.
             if any(rule(event) for rule in self.reset_rules):
-                self.reset()
+                self._clear_tail()
 
             match = self.pattern.match(event)
             if match:
@@ -103,18 +146,47 @@ class Conversation:
             new.append(message)
             self._store(message)
         self.last_input = sample
+        self._publish_snapshot()
         return new
 
     def remember(self, text: str) -> None:
         """Store a local reply that the world will not echo through add()."""
         self.last_output = text.strip()
         self._store(Message(speaker="", text=self.last_output, mine=True))
+        self._publish_snapshot()
 
     def discard_last_output(self) -> None:
         """Forget the latest local reply when a policy decides not to send it."""
         if self.history and self.history[-1].mine:
             self.history.pop()
         self.last_output = ""
+        self._publish_snapshot()
+
+    def _publish_snapshot(self) -> None:
+        """Atomically expose this conversation to local monitoring tools."""
+        if self.snapshot_file is None:
+            return
+        snapshot = {
+            "updated_at": time.time(),
+            "history": [message._asdict() for message in self.history],
+            "last_input": self.last_input,
+            "last_output": self.last_output,
+        }
+        temporary = self.snapshot_file.with_suffix(self.snapshot_file.suffix + ".tmp")
+        try:
+            self.snapshot_file.parent.mkdir(parents=True, exist_ok=True)
+            temporary.write_text(
+                json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            temporary.chmod(0o600)
+            os.replace(temporary, self.snapshot_file)
+        except OSError:
+            # Observability must never interrupt the processor.
+            try:
+                temporary.unlink(missing_ok=True)
+            except OSError:
+                pass
 
     def _store(self, message: Message) -> None:
         if not message.text:
@@ -129,10 +201,36 @@ class Conversation:
         if self.keep == 1:
             return
 
-        # Rotate the oldest tail message when all k slots are occupied.
+        # Every later event rotates equally, regardless of its source or type.
         if self.keep and len(self.history) >= self.keep:
             self.history.pop(1)
         self.history.append(message)
+        self._fit_context_window()
+
+    def _fit_context_window(self) -> None:
+        """Rotate the old tail until the next request fits conservatively.
+
+        UTF-8 byte length is used as a tokenizer-independent upper-bound
+        estimate. The first event and newest event are never split or altered.
+        """
+        if not self.context_window_tokens:
+            return
+        input_budget = (
+            self.context_window_tokens
+            - self.response_reserve_tokens
+            - CONTEXT_TEMPLATE_RESERVE_TOKENS
+        )
+        if input_budget <= 0:
+            raise ValueError("Model context leaves no room for processor input")
+        while len(self.history) > 2 and self._estimated_input_tokens() > input_budget:
+            self.history.pop(1)
+
+    def _estimated_input_tokens(self) -> int:
+        prompt = self.system_prompt
+        transcript = self.transcript()
+        if prompt and transcript:
+            prompt += "\n"
+        return len((prompt + transcript).encode("utf-8"))
 
     def last_message(self, mine: bool = False) -> Message | None:
         """Return the latest remote message, or a local one when mine=True."""

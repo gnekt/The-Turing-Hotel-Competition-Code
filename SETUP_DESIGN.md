@@ -52,7 +52,24 @@ Each row records the runtime model ID, capacity tier, parameter count, concurren
 - 50-human setup seed: `20260950`;
 - 100-human setup seed: `20261000`.
 
-The system prompt, sampling settings, timing-policy parameters, and 100-message history limit are held constant across setups. Model availability and provider behavior should be recorded again on each deployment date.
+The system prompt, sampling settings, timing-policy parameters, and conversation
+retention algorithm are held constant across setups. Retention uses two bounds:
+at most 100 messages and the runtime model context window. The first received
+event is always retained; when either bound is exceeded, the oldest event in
+the remaining tail is removed first.
+
+Context budgeting uses a common 32,768-token ceiling for every model condition.
+This is the maximum currently exposed by Featherless for all Qwen and Gemma
+configurations and is deliberately also imposed on Claude Opus, so additional
+context capacity cannot become a model-family confound. Every condition reserves
+the same 512 tokens for message templates and 8,192 tokens for the next output.
+Since downloading model tokenizers at runtime would add a model-specific network
+dependency, input length is conservatively estimated by UTF-8 byte count. The
+same deterministic estimator is used in every experimental cell. Longer native
+windows and Qwen's optional YaRN extension are intentionally not used.
+
+Model availability and provider behavior should be recorded again on each
+deployment date.
 
 ## Operational requirements
 
