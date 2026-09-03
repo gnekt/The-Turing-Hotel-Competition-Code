@@ -43,3 +43,7 @@ account_key
 
 # Local copies
 * copy.csv
+tui_launcher/
+.impeccable/
+DESIGN.md
+PRODUCT.md

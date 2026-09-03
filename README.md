@@ -90,12 +90,17 @@ The local TUI asks for the UNaIVERSE account key only the first time and stores 
 python run.py featherless_keys.txt --setup christian_compt_setup_50_humans.csv
 ```
 
-The TUI also includes a live conversation monitor. For every configured agent
-it shows the actual `Conversation.history`, the latest processor input, the
-latest output, session status, model, policy, persona condition, and snapshot
-age. Use Up/Down to choose an agent, Tab to move between panels, and `q` to
-return to the launcher. Snapshots are written atomically under the Git-ignored
-`logs/state/` directory and are never used as processor input.
+The TUI also includes a live operations register. Its header summarizes active,
+waiting, generating, and failed agents. Each agent row shows its runtime phase
+and retained-message count; the inspector exposes turn duration, policy wait,
+Conversation counters, resets, evictions, the conservative context estimate,
+model, policy, persona, and design cell. The retained `Conversation.history`
+remains the main panel, with the latest processor input and completed output
+beside it. Use Up/Down to choose an agent, Tab to move between panels, Page Up
+and Page Down to scroll, and `q` to return to the launcher. Snapshots are
+written atomically under the Git-ignored `logs/state/` directory and are never
+used as processor input. Runtime errors are redacted before being exposed; API
+and account credentials are never included in snapshots.
 
 To stop every `competition_agent_*` screen and relaunch the complete 12-agent setup with all model families:
 

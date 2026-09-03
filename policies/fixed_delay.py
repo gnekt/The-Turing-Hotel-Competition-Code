@@ -15,11 +15,19 @@ class FixedDelay:
             return action_id, request
 
         now = time.monotonic()
+        agent = opts.get("agent")
+        processor = getattr(getattr(agent, "proc", None), "module", None)
+        conversation = getattr(processor, "conv", None)
         if "fixed_delay_ready_at" not in opts:
-            opts["fixed_delay_ready_at"] = now + self.seconds + random.uniform(0, self.jitter)
+            delay = self.seconds + random.uniform(0, self.jitter)
+            opts["fixed_delay_ready_at"] = now + delay
+            if hasattr(conversation, "mark_waiting"):
+                conversation.mark_waiting(delay)
 
         if now < opts["fixed_delay_ready_at"]:
             return -1, None
 
         del opts["fixed_delay_ready_at"]
+        if hasattr(conversation, "mark_processing"):
+            conversation.mark_processing()
         return action_id, request

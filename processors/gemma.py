@@ -72,6 +72,7 @@ class GemmaAgent:
             context_window_tokens=model_context_tokens(model),
             response_reserve_tokens=EXPERIMENT_RESPONSE_RESERVE_TOKENS,
             system_prompt=personas,
+            sensitive_values=(api_key,),
         )
         self.conv = self.conversation
         self.personas = personas
@@ -82,12 +83,16 @@ class GemmaAgent:
         self.api = build(model=model, cost=cost, system_prompt=personas, api_key=api_key)
 
     def __call__(self, message: str) -> str:
-        self.conversation.add(message)
-        prompt = self.conversation.as_messages()
-        prompt_text = "\n".join(f"{item['role']}: {item['content']}" for item in prompt)
-        response = _answer_only(self.api(prompt_text))
-        self.conversation.remember(response)
-        return response
+        try:
+            self.conversation.add(message)
+            prompt = self.conversation.as_messages()
+            prompt_text = "\n".join(f"{item['role']}: {item['content']}" for item in prompt)
+            response = _answer_only(self.api(prompt_text))
+            self.conversation.remember(response)
+            return response
+        except Exception as error:
+            self.conversation.fail(error)
+            raise
 
 
 # Backward compatibility for code that imported the old, incorrectly named class.

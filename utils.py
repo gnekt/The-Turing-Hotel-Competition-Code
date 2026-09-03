@@ -94,7 +94,7 @@ class Conversation:
     def __init__(self, keep: int = 80, speaker_pattern: str = SPEAKER, me: str = "Io",
                  reset_rules=DEFAULT_RESET_RULES, snapshot_file=None,
                  context_window_tokens: int = 0, response_reserve_tokens: int = 0,
-                 system_prompt: str = ""):
+                 system_prompt: str = "", sensitive_values=()):
         self.keep = keep
         self.pattern = re.compile(speaker_pattern, re.S)
         self.me = me
@@ -105,12 +105,35 @@ class Conversation:
         self.context_window_tokens = context_window_tokens
         self.response_reserve_tokens = response_reserve_tokens
         self.system_prompt = system_prompt
+        now = time.time()
+        self.created_at = now
+        self.phase = "idle"
+        self.phase_started_at = now
+        self.waiting_until = None
+        self.turn_started_at = None
+        self.last_turn_duration_seconds = None
+        self.last_input_at = None
+        self.last_output_at = None
+        self.last_error = None
+        self.received_events = 0
+        self.sent_outputs = 0
+        self.reset_count = 0
+        self.discarded_outputs = 0
+        self.evicted_messages = 0
+        environment_secrets = (
+            os.environ.get("COMPETITION_FEATHERLESS_KEY"),
+            os.environ.get("COMPETITION_UNAIVERSE_KEY"),
+        )
+        self.sensitive_values = tuple(
+            value for value in (*sensitive_values, *environment_secrets) if value
+        )
         configured_snapshot = snapshot_file or os.environ.get("COMPETITION_STATE_FILE")
         self.snapshot_file = Path(configured_snapshot) if configured_snapshot else None
         self._publish_snapshot()
 
     def reset(self) -> None:
         """Clear the rotating slots while preserving the first message."""
+        self.reset_count += 1
         self._clear_tail()
         self._publish_snapshot()
 
@@ -127,6 +150,13 @@ class Conversation:
         the speaker pattern does not match, the whole event is stored with an
         empty speaker. Empty messages are omitted from the history.
         """
+        now = time.time()
+        self.phase = "generating"
+        self.phase_started_at = now
+        self.waiting_until = None
+        self.turn_started_at = now
+        self.last_input_at = now
+        self.last_error = None
         new = []
         for event in sample.split(EVENT_SEPARATOR):
             event = event.strip()
@@ -135,6 +165,7 @@ class Conversation:
 
             # Clear the rotating tail first; the trigger is stored below.
             if any(rule(event) for rule in self.reset_rules):
+                self.reset_count += 1
                 self._clear_tail()
 
             match = self.pattern.match(event)
@@ -144,6 +175,7 @@ class Conversation:
                 speaker, text = "", event   # Preserve the full unmatched event.
             message = Message(speaker=speaker, text=text, mine=False)
             new.append(message)
+            self.received_events += 1
             self._store(message)
         self.last_input = sample
         self._publish_snapshot()
@@ -151,8 +183,12 @@ class Conversation:
 
     def remember(self, text: str) -> None:
         """Store a local reply that the world will not echo through add()."""
+        now = time.time()
         self.last_output = text.strip()
+        self.last_output_at = now
+        self.sent_outputs += 1
         self._store(Message(speaker="", text=self.last_output, mine=True))
+        self._finish_turn(now, "idle")
         self._publish_snapshot()
 
     def discard_last_output(self) -> None:
@@ -160,17 +196,98 @@ class Conversation:
         if self.history and self.history[-1].mine:
             self.history.pop()
         self.last_output = ""
+        self.discarded_outputs += 1
+        self._finish_turn(time.time(), "idle")
         self._publish_snapshot()
+
+    def mark_waiting(self, delay_seconds: float) -> None:
+        """Expose a policy delay without affecting conversation behavior."""
+        now = time.time()
+        self.phase = "waiting"
+        self.phase_started_at = now
+        self.waiting_until = now + max(0.0, delay_seconds)
+        self._publish_snapshot()
+
+    def mark_processing(self) -> None:
+        """Mark the transition from policy delay to processor execution."""
+        self.phase = "processing"
+        self.phase_started_at = time.time()
+        self.waiting_until = None
+        self._publish_snapshot()
+
+    def fail(self, error: BaseException) -> None:
+        """Record a processor failure while keeping observability best-effort."""
+        now = time.time()
+        message = str(error).replace("\n", " ").strip()
+        message = re.sub(
+            r"(?i)(api[-_ ]?key|authorization|bearer)(\s*[:=]\s*|\s+)[^\s,;]+",
+            r"\1=<redacted>",
+            message,
+        )
+        for secret in self.sensitive_values:
+            message = message.replace(secret, "<redacted>")
+        self.last_error = {
+            "at": now,
+            "type": type(error).__name__,
+            "message": message[:400] or "Errore senza messaggio",
+        }
+        self._finish_turn(now, "error")
+        self._publish_snapshot()
+
+    def _finish_turn(self, now: float, phase: str) -> None:
+        if self.turn_started_at is not None:
+            self.last_turn_duration_seconds = max(0.0, now - self.turn_started_at)
+        self.turn_started_at = None
+        self.phase = phase
+        self.phase_started_at = now
+        self.waiting_until = None
 
     def _publish_snapshot(self) -> None:
         """Atomically expose this conversation to local monitoring tools."""
         if self.snapshot_file is None:
             return
+        input_budget = max(
+            0,
+            self.context_window_tokens
+            - self.response_reserve_tokens
+            - CONTEXT_TEMPLATE_RESERVE_TOKENS,
+        )
+        estimated_input = self._estimated_input_tokens()
+        remote_messages = sum(not message.mine for message in self.history)
+        local_messages = len(self.history) - remote_messages
         snapshot = {
+            "schema_version": 2,
             "updated_at": time.time(),
+            "created_at": self.created_at,
+            "phase": self.phase,
+            "phase_started_at": self.phase_started_at,
+            "waiting_until": self.waiting_until,
+            "turn_started_at": self.turn_started_at,
+            "last_turn_duration_seconds": self.last_turn_duration_seconds,
+            "last_input_at": self.last_input_at,
+            "last_output_at": self.last_output_at,
+            "last_error": self.last_error,
             "history": [message._asdict() for message in self.history],
             "last_input": self.last_input,
             "last_output": self.last_output,
+            "stats": {
+                "remote_messages": remote_messages,
+                "local_messages": local_messages,
+                "received_events": self.received_events,
+                "sent_outputs": self.sent_outputs,
+                "resets": self.reset_count,
+                "discarded_outputs": self.discarded_outputs,
+                "evicted_messages": self.evicted_messages,
+            },
+            "context": {
+                "retained_messages": len(self.history),
+                "retention_limit": self.keep,
+                "estimated_input_tokens": estimated_input,
+                "input_budget_tokens": input_budget,
+                "context_window_tokens": self.context_window_tokens,
+                "response_reserve_tokens": self.response_reserve_tokens,
+                "template_reserve_tokens": CONTEXT_TEMPLATE_RESERVE_TOKENS,
+            },
         }
         temporary = self.snapshot_file.with_suffix(self.snapshot_file.suffix + ".tmp")
         try:
@@ -204,6 +321,7 @@ class Conversation:
         # Every later event rotates equally, regardless of its source or type.
         if self.keep and len(self.history) >= self.keep:
             self.history.pop(1)
+            self.evicted_messages += 1
         self.history.append(message)
         self._fit_context_window()
 
@@ -224,6 +342,7 @@ class Conversation:
             raise ValueError("Model context leaves no room for processor input")
         while len(self.history) > 2 and self._estimated_input_tokens() > input_budget:
             self.history.pop(1)
+            self.evicted_messages += 1
 
     def _estimated_input_tokens(self) -> int:
         prompt = self.system_prompt

@@ -27,9 +27,14 @@ class ReadAndType:
             typing = len(conversation.last_output) / self.type_cps
             delay = min(max(reading + thinking + typing, self.min_delay), self.max_delay)
             opts["read_and_type_ready_at"] = now + delay
+            if hasattr(conversation, "mark_waiting"):
+                conversation.mark_waiting(delay)
 
         if now < opts["read_and_type_ready_at"]:
             return -1, None
 
         del opts["read_and_type_ready_at"]
+        conversation = opts["agent"].proc.module.conv
+        if hasattr(conversation, "mark_processing"):
+            conversation.mark_processing()
         return action_id, request

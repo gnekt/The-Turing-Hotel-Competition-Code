@@ -21,9 +21,13 @@ class OpusAgent:
         self.effort = effort
     
     def __call__(self, message: str) -> str:
-        self.conversation.add(message)
-        prompt = self.conversation.as_messages(system=self.personas)
-        prompt_text = "\n".join(f"{m['role']}: {m['content']}" for m in prompt)
-        response = call_claude_prompt(prompt_text, model="opus", effort=self.effort)
-        self.conversation.remember(response)
-        return response
+        try:
+            self.conversation.add(message)
+            prompt = self.conversation.as_messages(system=self.personas)
+            prompt_text = "\n".join(f"{m['role']}: {m['content']}" for m in prompt)
+            response = call_claude_prompt(prompt_text, model="opus", effort=self.effort)
+            self.conversation.remember(response)
+            return response
+        except Exception as error:
+            self.conversation.fail(error)
+            raise
