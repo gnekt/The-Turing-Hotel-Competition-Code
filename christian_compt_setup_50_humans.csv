@@ -5,27 +5,27 @@ id,agent_name,competition_agnostic,llm,model_id,featherless_model_key,model_capa
 50004,Cypher,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QS_S_N,1,20260950
 50005,Binary,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GS_S_N,1,20260950
 50006,DuJour,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QS_S_N,2,20260950
-50007,Mouse,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,C_S_P,1,20260950
+50007,Mouse,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,C_S_P,1,20260950
 50008,AgentBrown,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,GL_S_P,2,20260950
 50009,Morpheus,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,GL_C_P,1,20260950
 50010,Trinity,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GL_S_N,1,20260950
 50011,Lock,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P3,persona,QL_C_P,2,20260950
 50012,Choi,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GL_C_N,2,20260950
-50013,AgentJones,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,C_C_N,1,20260950
+50013,AgentJones,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,C_C_N,1,20260950
 50014,Rhineheart,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,QS_C_P,2,20260950
 50015,Dozer,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QS_C_N,1,20260950
 50016,Ballard,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,GS_S_P,1,20260950
 50017,Ghost,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GS_C_N,1,20260950
 50018,Link,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,QL_C_P,1,20260950
-50019,Axel,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,C_C_N,2,20260950
+50019,Axel,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,C_C_N,2,20260950
 50020,CouncillorHamann,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GS_C_N,2,20260950
-50021,Apoc,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,C_C_P,1,20260950
+50021,Apoc,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,C_C_P,1,20260950
 50022,Maggie,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QL_C_N,1,20260950
-50023,Architect,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona,C_S_P,2,20260950
+50023,Architect,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona,C_S_P,2,20260950
 50024,Bane,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,GS_S_P,2,20260950
 50025,Oracle,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona,QS_S_P,1,20260950
 50026,Keymaker,yes,Qwen 3 32B,Qwen/Qwen3-32B,qwen_large,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QL_S_N,1,20260950
-50027,Switch,yes,Claude Opus,opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,C_S_N,1,20260950
+50027,Switch,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,C_S_N,1,20260950
 50028,AgentSmith,yes,Gemma 4 31B,google/gemma-4-31B-it,gemma_large,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GL_C_N,1,20260950
 50029,Tank,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,qwen_small,Small,0.6B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P4,persona,QS_C_P,1,20260950
 50030,Cas,yes,Gemma 4 E2B,google/gemma-4-E2B-it,gemma_small,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,GS_C_P,1,20260950

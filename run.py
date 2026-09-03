@@ -35,7 +35,7 @@ def model_id_for(config):
         return "google/gemma-4-31B-it"
     if config["llm"].startswith("Qwen"):
         return "Qwen/Qwen3-0.6B"
-    return "opus"
+    return "Claude Opus"
 
 
 def node_name_for(config):
