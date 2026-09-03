@@ -14,6 +14,8 @@ Preserving density makes scale the principal planned difference between deployme
 
 Agent names are unique character names drawn from the four Matrix feature films and, for the 60-agent setup, the Matrix anthology film *The Animatrix*. Names are labels only: they do not define a persona or alter the prompt condition.
 
+Featherless credentials are referenced by aliases rather than embedded secrets. The original setup mapping is preserved as `chatA_1 → chat1`, `chatB_2 → chat2`, and `chatC_2 → chat3`. The 30-agent setup assigns 8 open-model agents to `agent_standard` and 4 to each `chat1`–`chat4`, matching one complete 24-agent credential allocation. The 60-agent setup doubles those counts while preserving the assignments of the nested 30-agent setup.
+
 ## Model matrix
 
 The open-weight conditions form a family-by-capacity design. Claude Opus is retained as a separate closed-model reference and is not included in parameter-count comparisons.

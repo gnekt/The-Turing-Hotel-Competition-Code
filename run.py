@@ -4,7 +4,6 @@ import os
 import subprocess
 import sys
 import time
-from itertools import cycle
 from pathlib import Path
 
 # Normal relaunches must not be rejected because a previous process was still
@@ -25,6 +24,59 @@ WORLD = "jolly-mayer/TuringHotelItaly"
 ROOT = Path(__file__).parent
 SETUP_FILE = ROOT / "christian_compt_setup.csv"
 LOGS_DIR = ROOT / "logs"
+ACCOUNT_KEY_FILE = ROOT / "account_key"
+
+
+def load_account_key():
+    try:
+        return ACCOUNT_KEY_FILE.read_text(encoding="utf-8").strip()
+    except FileNotFoundError:
+        return ""
+
+
+def save_account_key(account_key):
+    ACCOUNT_KEY_FILE.parent.mkdir(exist_ok=True)
+    ACCOUNT_KEY_FILE.write_text(account_key.strip() + "\n", encoding="utf-8")
+    ACCOUNT_KEY_FILE.chmod(0o600)
+
+
+def load_featherless_keys(filename):
+    keys = {}
+    with open(filename, newline="", encoding="utf-8") as file:
+        for line_number, row in enumerate(csv.reader(file), start=1):
+            if not row or not any(value.strip() for value in row):
+                continue
+            if len(row) != 3:
+                raise ValueError(
+                    f"invalid Featherless key row {line_number}: expected alias,key,capacity"
+                )
+            alias, secret, capacity_value = (value.strip() for value in row)
+            if not alias or not secret:
+                raise ValueError(f"invalid Featherless key row {line_number}: empty value")
+            if alias in keys:
+                raise ValueError(f"duplicate Featherless key alias: {alias}")
+            try:
+                capacity = int(capacity_value)
+            except ValueError as error:
+                raise ValueError(
+                    f"invalid capacity for Featherless key alias: {alias}"
+                ) from error
+            if capacity <= 0:
+                raise ValueError(f"capacity must be positive for Featherless key alias: {alias}")
+            keys[alias] = {"secret": secret, "capacity": capacity}
+    if not keys:
+        raise ValueError("the Featherless keys file is empty")
+    return keys
+
+
+def featherless_key_for(config, keys):
+    alias = config["featherless_model_key"]
+    if alias == "NA":
+        return None
+    try:
+        return keys[alias]["secret"]
+    except KeyError as error:
+        raise ValueError(f"missing Featherless key alias: {alias}") from error
 
 
 def model_id_for(config):
@@ -166,23 +218,40 @@ def launch_agent(config, featherless_key, unaiverse_key, setup_file=SETUP_FILE):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("featherless_keys_file")
-    parser.add_argument("unaiverse_key")
+    parser.add_argument(
+        "unaiverse_key",
+        nargs="?",
+        help="UNaIVERSE account key; defaults to ./account_key",
+    )
     parser.add_argument("--setup", type=Path, default=SETUP_FILE)
     args = parser.parse_args()
 
     setup_file = args.setup.expanduser().resolve()
+    unaiverse_key = args.unaiverse_key or load_account_key()
+    if not unaiverse_key:
+        parser.error(
+            "missing UNaIVERSE account key: pass unaiverse_key or save it with the TUI"
+        )
 
-    with open(args.featherless_keys_file, encoding="utf-8") as file:
-        keys = cycle(line.strip() for line in file if line.strip())
+    try:
+        keys = load_featherless_keys(args.featherless_keys_file)
+    except (OSError, ValueError) as error:
+        parser.error(str(error))
 
     with setup_file.open(newline="", encoding="utf-8") as file:
         configs = list(csv.DictReader(file))
 
+    try:
+        for config in configs:
+            featherless_key_for(config, keys)
+    except ValueError as error:
+        parser.error(str(error))
+
     LOGS_DIR.mkdir(exist_ok=True)
     started = 0
     for index, config in enumerate(configs):
-        key = next(keys) if config["featherless_model_key"] != "NA" else None
-        started += launch_agent(config, key, args.unaiverse_key, setup_file)
+        key = featherless_key_for(config, keys)
+        started += launch_agent(config, key, unaiverse_key, setup_file)
         if index < len(configs) - 1:
             time.sleep(16)
 

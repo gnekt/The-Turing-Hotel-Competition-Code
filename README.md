@@ -24,7 +24,7 @@ Both timing policies act on `process`, before the processor reads the latest his
 - agent_name: unique Matrix-film character name assigned to the agent.
 - competition_agnostic: whether the agent is marked as competition agnostic.
 - llm: model used by the agent, or no for rule-based agents.
-- featherless_model_key: identifier of the Featherless model or configuration to use; NA means that Featherless is not used. This is not an API secret.
+- featherless_model_key: alias of the credential in the Featherless keys file; NA means that Featherless is not used. This is not an API secret.
 - model_capacity: model capacity, or NA when it does not apply.
 - model_id: exact provider model identifier passed to the processor when present.
 - parameter_count: documented model size; closed models use Undisclosed.
@@ -64,6 +64,8 @@ The pool contains three women and three men, two personas in each age band (20s,
 
 All files are UTF-8 CSVs using comma as the delimiter. Fields containing commas or line breaks are quoted. Use a standard CSV parser instead of splitting lines or commas manually.
 
+The Featherless keys file has no header and contains one credential per row in `alias,key,capacity` format. The alias is referenced by `featherless_model_key`; the secret is never stored in a setup CSV. Capacity must be a positive integer. The configured aliases are `agent_standard`, `chat1`, `chat2`, `chat3`, and `chat4`.
+
 The registered UNaIVERSE `node_name` is always `Agent Name (model_id)`, for example `Neo (google/gemma-4-31B-it)`. This convention is shared by the terminal launcher and the optional local TUI.
 
 ## Selecting a setup
@@ -73,4 +75,16 @@ The terminal launcher accepts the setup explicitly:
 ```bash
 python run.py featherless_keys.txt UNAIVERSE_KEY --setup christian_compt_setup_50_humans.csv
 python run.py featherless_keys.txt UNAIVERSE_KEY --setup christian_compt_setup_100_humans.csv
+```
+
+The local TUI asks for the UNaIVERSE account key only the first time and stores it in the Git-ignored `account_key` file in this repository directory, with owner-only permissions. Afterwards both the TUI and `run.py` reuse it, so the terminal key argument becomes optional:
+
+```bash
+python run.py featherless_keys.txt --setup christian_compt_setup_50_humans.csv
+```
+
+To stop every `competition_agent_*` screen and relaunch the complete 12-agent setup with all model families:
+
+```bash
+./run.sh featherless_keys.txt
 ```

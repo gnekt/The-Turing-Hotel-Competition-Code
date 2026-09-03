@@ -28,6 +28,7 @@ venv/
 env/
 
 # Secrets and local configuration
+account_key
 .env
 .env.*
 !.env.example
