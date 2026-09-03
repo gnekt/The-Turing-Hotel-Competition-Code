@@ -66,7 +66,7 @@ All files are UTF-8 CSVs using comma as the delimiter. Fields containing commas 
 
 The Featherless keys file has no header and contains one credential per row in `alias,key,capacity` format. The alias is referenced by `featherless_model_key`; the secret is never stored in a setup CSV. Capacity must be a positive integer. The configured aliases are `agent_standard`, `chat1`, `chat2`, `chat3`, and `chat4`.
 
-The registered UNaIVERSE `node_name` is always `Agent Name (model_id)`, for example `Neo (google/gemma-4-31B-it)`. This convention is shared by the terminal launcher and the optional local TUI.
+The registered UNaIVERSE `node_name` is always `Agent Name (model_id)`, without the provider prefix: for example `Neo (gemma-4-31B-it)` instead of `Neo (google/gemma-4-31B-it)`. The complete model ID is still passed to the processor. This convention is shared by the terminal launcher and the optional local TUI.
 
 ## Selecting a setup
 
@@ -75,6 +75,13 @@ The terminal launcher accepts the setup explicitly:
 ```bash
 python run.py featherless_keys.txt UNAIVERSE_KEY --setup christian_compt_setup_50_humans.csv
 python run.py featherless_keys.txt UNAIVERSE_KEY --setup christian_compt_setup_100_humans.csv
+```
+
+The same setups can be selected with the shorter aliases `20`, `50`, and `100`:
+
+```bash
+python run.py featherless_keys.txt --setup 50
+python run.py featherless_keys.txt --setup 100
 ```
 
 The local TUI asks for the UNaIVERSE account key only the first time and stores it in the Git-ignored `account_key` file in this repository directory, with owner-only permissions. Afterwards both the TUI and `run.py` reuse it, so the terminal key argument becomes optional:
@@ -86,5 +93,7 @@ python run.py featherless_keys.txt --setup christian_compt_setup_50_humans.csv
 To stop every `competition_agent_*` screen and relaunch the complete 12-agent setup with all model families:
 
 ```bash
-./run.sh featherless_keys.txt
+./run.sh featherless_keys.txt 20
+./run.sh featherless_keys.txt 50
+./run.sh featherless_keys.txt 100
 ```

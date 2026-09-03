@@ -23,8 +23,20 @@ from prompts import build_system_prompt
 WORLD = "jolly-mayer/TuringHotelItaly"
 ROOT = Path(__file__).parent
 SETUP_FILE = ROOT / "christian_compt_setup.csv"
+SETUP_FILES = {
+    "20": SETUP_FILE,
+    "50": ROOT / "christian_compt_setup_50_humans.csv",
+    "100": ROOT / "christian_compt_setup_100_humans.csv",
+}
 LOGS_DIR = ROOT / "logs"
 ACCOUNT_KEY_FILE = ROOT / "account_key"
+DEFAULT_MODEL_IDS = {
+    "Gemma 4 31B": "google/gemma-4-31B-it",
+    "Gemma 4 E2B": "google/gemma-4-E2B-it",
+    "Qwen 3 32B": "Qwen/Qwen3-32B",
+    "Qwen 3 0.6B": "Qwen/Qwen3-0.6B",
+    "Claude Opus": "Claude Opus",
+}
 
 
 def load_account_key():
@@ -38,6 +50,10 @@ def save_account_key(account_key):
     ACCOUNT_KEY_FILE.parent.mkdir(exist_ok=True)
     ACCOUNT_KEY_FILE.write_text(account_key.strip() + "\n", encoding="utf-8")
     ACCOUNT_KEY_FILE.chmod(0o600)
+
+
+def resolve_setup(value):
+    return SETUP_FILES.get(str(value), Path(value)).expanduser().resolve()
 
 
 def load_featherless_keys(filename):
@@ -83,16 +99,16 @@ def model_id_for(config):
     model_id = config.get("model_id", "").strip()
     if model_id:
         return model_id
-    if config["llm"].startswith("Gemma"):
-        return "google/gemma-4-31B-it"
-    if config["llm"].startswith("Qwen"):
-        return "Qwen/Qwen3-0.6B"
-    return "Claude Opus"
+    try:
+        return DEFAULT_MODEL_IDS[config["llm"]]
+    except KeyError as error:
+        raise ValueError(f"unsupported model configuration: {config['llm']}") from error
 
 
 def node_name_for(config):
     agent_name = config["agent_name"] or f"MyGuest{config['id']}"
-    return f"{agent_name} ({model_id_for(config)})"
+    short_model_id = model_id_for(config).rsplit("/", 1)[-1]
+    return f"{agent_name} ({short_model_id})"
 
 
 def run_agent(config, featherless_key, unaiverse_key):
@@ -223,10 +239,14 @@ def main():
         nargs="?",
         help="UNaIVERSE account key; defaults to ./account_key",
     )
-    parser.add_argument("--setup", type=Path, default=SETUP_FILE)
+    parser.add_argument(
+        "--setup",
+        default="20",
+        help="setup alias (20, 50, 100) or CSV path; defaults to 20",
+    )
     args = parser.parse_args()
 
-    setup_file = args.setup.expanduser().resolve()
+    setup_file = resolve_setup(args.setup)
     unaiverse_key = args.unaiverse_key or load_account_key()
     if not unaiverse_key:
         parser.error(

@@ -14,6 +14,7 @@ from run import (
     LOGS_DIR,
     ROOT,
     SETUP_FILE,
+    SETUP_FILES,
     featherless_key_for,
     launch_agent,
     load_featherless_keys,
@@ -43,16 +44,15 @@ def load_configs(setup_file):
 
 
 def choose_setup():
-    setup_files = [
-        SETUP_FILE,
-        *sorted(ROOT.glob("christian_compt_setup_*_humans.csv")),
+    setup_options = [
+        (SETUP_FILES["20"], "20 umani · 12 agenti"),
+        (SETUP_FILES["50"], "50 umani · 30 agenti"),
+        (SETUP_FILES["100"], "100 umani · 60 agenti"),
     ]
-    if len(setup_files) == 1:
-        return setup_files[0]
     return radiolist_dialog(
         title="Turing Hotel · Setup",
         text="Quale configurazione vuoi gestire?",
-        values=[(path, path.stem) for path in setup_files],
+        values=setup_options,
         default=SETUP_FILE,
         ok_text="Continua",
         cancel_text="Esci",

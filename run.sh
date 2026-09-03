@@ -2,14 +2,21 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SETUP_FILE="$ROOT_DIR/christian_compt_setup.csv"
-
-if [[ $# -ne 1 ]]; then
-    echo "Usage: $0 FEATHERLESS_KEYS_FILE" >&2
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+    echo "Usage: $0 FEATHERLESS_KEYS_FILE [20|50|100]" >&2
     exit 2
 fi
 
 FEATHERLESS_KEYS_FILE="$(realpath -- "$1")"
+SETUP="${2:-20}"
+
+case "$SETUP" in
+    20|50|100) ;;
+    *)
+        echo "Invalid setup: choose 20, 50, or 100." >&2
+        exit 2
+        ;;
+esac
 
 if [[ ! -s "$FEATHERLESS_KEYS_FILE" ]]; then
     echo "Featherless keys file is missing or empty: $FEATHERLESS_KEYS_FILE" >&2
@@ -31,4 +38,4 @@ for session in "${sessions[@]}"; do
     screen -S "$session" -X quit
 done
 
-exec python "$ROOT_DIR/run.py" "$FEATHERLESS_KEYS_FILE" --setup "$SETUP_FILE"
+exec python "$ROOT_DIR/run.py" "$FEATHERLESS_KEYS_FILE" --setup "$SETUP"
