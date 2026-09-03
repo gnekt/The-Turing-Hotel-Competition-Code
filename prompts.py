@@ -1,11 +1,21 @@
 import csv
+from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 
 ROOT = Path(__file__).parent
 HUMAN_BEHAVIOUR_FILE = ROOT / "human_behaviour.md"
 PERSONAS_FILE = ROOT / "turing_personas.csv"
+ITALY_TIMEZONE = ZoneInfo("Europe/Rome")
+ITALIAN_WEEKDAYS = (
+    "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"
+)
+ITALIAN_MONTHS = (
+    "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+    "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre",
+)
 
 PERSONA_FIELDS = (
     ("nome", "Nome"),
@@ -30,6 +40,21 @@ def _human_behaviour():
 def _personas():
     with PERSONAS_FILE.open(newline="", encoding="utf-8") as file:
         return {row["persona_id"]: row for row in csv.DictReader(file)}
+
+
+def current_italian_context(now=None):
+    """Build fresh calendar context for one model generation."""
+    current = now.astimezone(ITALY_TIMEZONE) if now else datetime.now(ITALY_TIMEZONE)
+    weekday = ITALIAN_WEEKDAYS[current.weekday()]
+    month = ITALIAN_MONTHS[current.month - 1]
+    timezone_name = current.tzname() or "ora italiana"
+    return (
+        "## Contesto temporale interno aggiornato\n"
+        f"In Italia è {weekday} {current.day} {month} {current.year}, "
+        f"ore {current:%H:%M:%S} ({timezone_name}).\n"
+        "Usa questa informazione soltanto quando è pertinente. Non annunciarla "
+        "automaticamente e non trattarla come un messaggio degli interlocutori."
+    )
 
 
 def build_system_prompt(config):

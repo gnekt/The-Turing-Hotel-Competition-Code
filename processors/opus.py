@@ -1,5 +1,7 @@
 import os
 
+from prompts import current_italian_context
+
 from utils import (
     Conversation,
     EXPERIMENT_RESPONSE_RESERVE_TOKENS,
@@ -23,7 +25,10 @@ class OpusAgent:
     def __call__(self, message: str) -> str:
         try:
             self.conversation.add(message)
-            prompt = self.conversation.as_messages(system=self.personas)
+            prompt = self.conversation.as_messages(
+                system=self.personas,
+                nudge=current_italian_context(),
+            )
             prompt_text = "\n".join(f"{m['role']}: {m['content']}" for m in prompt)
             response = call_claude_prompt(prompt_text, model="opus", effort=self.effort)
             self.conversation.remember(response)

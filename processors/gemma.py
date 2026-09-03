@@ -8,6 +8,7 @@ from utils import (
     model_context_tokens,
     single_text_output,
 )
+from prompts import current_italian_context
 
 
 THINK_TOKEN = "<|think|>"
@@ -86,7 +87,7 @@ class GemmaAgent:
     def __call__(self, message: str) -> str:
         try:
             self.conversation.add(message)
-            prompt = self.conversation.as_messages()
+            prompt = self.conversation.as_messages(nudge=current_italian_context())
             prompt_text = "\n".join(f"{item['role']}: {item['content']}" for item in prompt)
             response = _answer_only(single_text_output(self.api(prompt_text)))
             self.conversation.remember(response)
