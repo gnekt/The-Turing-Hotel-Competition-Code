@@ -11,19 +11,11 @@ from utils import (
 from prompts import current_italian_context
 
 
-THINK_TOKEN = "<|think|>"
 GEMMA_THOUGHT_BLOCK = re.compile(
     r"<\|channel>thought\b.*?(?:<channel\|>|<\|channel\|>)\s*",
     re.DOTALL | re.IGNORECASE,
 )
 THINKING_BLOCK = re.compile(r"<think>.*?</think>\s*", re.DOTALL | re.IGNORECASE)
-
-
-def _thinking_system_prompt(system_prompt: str) -> str:
-    """Enable Gemma 4 thinking without adding the control token twice."""
-    if system_prompt.lstrip().startswith(THINK_TOKEN):
-        return system_prompt
-    return f"{THINK_TOKEN}\n{system_prompt}" if system_prompt else THINK_TOKEN
 
 
 def _answer_only(response: str) -> str:
@@ -46,22 +38,21 @@ def build(
     temperature: float = 1.0,
     api_key: str = "",
 ) -> FeatherlessAPI:
-    """Build a Gemma 4 model with per-turn thinking and answer-only text output.
+    """Build a Gemma 4 model in non-thinking mode for realtime replies.
 
-    The gateway returns only ``message.content`` and discards a separate
-    reasoning field. Gemma's model card also says that thoughts from ordinary
-    turns must not be included in later history, so no preserved-thinking
-    option is enabled here.
+    The gateway returns only ``message.content`` and discards separate
+    reasoning. Thinking is disabled to prevent it from consuming the complete
+    output budget before the model emits an answer.
     """
     return FeatherlessAPI(
         model=model,
         cost=cost,
-        system_prompt=_thinking_system_prompt(system_prompt),
+        system_prompt=system_prompt,
         max_tokens=max_tokens,
         temperature=temperature,
         top_p=0.95,
         top_k=64,
-        sampler={"chat_template_kwargs": {"enable_thinking": True}},
+        sampler={"chat_template_kwargs": {"enable_thinking": False}},
         api_key=api_key,
     )
 
@@ -78,9 +69,8 @@ class GemmaAgent:
         )
         self.conv = self.conversation
         self.personas = personas
-        # The supplied Gemma 4 card documents binary thinking control, but no
-        # provider-level reasoning_effort values. Keep the common constructor
-        # argument without sending an unsupported API parameter.
+        # Keep the common constructor argument without sending an unsupported
+        # API parameter. Featherless agents run without thinking.
         self.effort = effort
         self.api = build(model=model, cost=cost, system_prompt=personas, api_key=api_key)
 

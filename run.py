@@ -35,7 +35,7 @@ DEFAULT_MODEL_IDS = {
     "Gemma 4 31B": "google/gemma-4-31B-it",
     "Gemma 4 E2B": "google/gemma-4-E2B-it",
     "Qwen 3 32B": "Qwen/Qwen3-32B",
-    "Qwen 3 0.6B": "Qwen/Qwen3-0.6B",
+    "Qwen 3.5 2B": "Qwen/Qwen3.5-2B",
     "Claude Opus": "Claude Opus",
 }
 
@@ -135,7 +135,7 @@ def run_agent(config, featherless_key, unaiverse_key):
             prompt,
             "medium",
             featherless_key,
-            model=model_id or "Qwen/Qwen3-0.6B",
+            model=model_id or "Qwen/Qwen3.5-2B",
             cost=int(cost_value or 1),
         )
     else:

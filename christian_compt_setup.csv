@@ -3,10 +3,10 @@ id,agent_name,competition_agnostic,llm,model_id,featherless_model_key,model_capa
 4,Trinity,yes,Gemma 4 31B,google/gemma-4-31B-it,chat2,Large,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona
 5,Morpheus,yes,Gemma 4 31B,google/gemma-4-31B-it,chat3,Large,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona
 6,AgentSmith,yes,Gemma 4 31B,google/gemma-4-31B-it,chat3,Large,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona
-7,Oracle,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,chat1,Small,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona
-8,Cypher,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,chat1,Small,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona
-9,Tank,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,chat1,Small,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P4,persona
-10,Dozer,yes,Qwen 3 0.6B,Qwen/Qwen3-0.6B,chat1,Small,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona
+7,Oracle,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat1,Small,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona
+8,Cypher,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat1,Small,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona
+9,Tank,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat1,Small,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P4,persona
+10,Dozer,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat1,Small,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona
 11,Mouse,yes,Claude Opus,Claude Opus,NA,Large,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona
 12,Switch,yes,Claude Opus,Claude Opus,NA,Large,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona
 13,Apoc,yes,Claude Opus,Claude Opus,NA,Large,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona

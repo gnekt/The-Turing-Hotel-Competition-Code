@@ -22,15 +22,15 @@ The open-weight conditions form a family-by-capacity design. Claude Opus is reta
 
 | Code | Family | Capacity tier | Runtime model | Parameters | Featherless concurrency cost |
 |---|---|---|---|---:|---:|
-| QS | Qwen 3 | Small | `Qwen/Qwen3-0.6B` | 0.6B | 1 |
+| QS | Qwen 3.5 | Small | `Qwen/Qwen3.5-2B` | 2B | 1 |
 | GS | Gemma 4 | Small | `google/gemma-4-E2B-it` | 2.3B effective | 1 |
 | QL | Qwen 3 | Large | `Qwen/Qwen3-32B` | 32.8B | 2 |
 | GL | Gemma 4 | Large | `google/gemma-4-31B-it` | 30.7B | 2 |
 | C | Claude | Closed reference | Claude Opus | Undisclosed | N/A |
 
-The large models are closely matched in parameter count and operational cost. The small models are not parameter-matched; they are the small instruction variants selected from their respective families and share the same Featherless concurrency tier. Analyses must therefore treat `capacity_tier` as a planned categorical factor rather than a precise continuous parameter match.
+The large models are closely matched in parameter count and operational cost. The small models are also in the same approximate capacity class: Qwen declares 2B parameters, while Gemma reports 2.3B effective parameters. Their architectures and parameter-accounting methods still differ, so analyses must treat `capacity_tier` as a planned categorical factor rather than a precise continuous parameter match.
 
-Provider records used for the frozen model metadata: [Qwen3-0.6B](https://featherless.ai/models/Qwen/Qwen3-0.6B), [Qwen3-32B](https://featherless.ai/models/Qwen/Qwen3-32B), [Gemma4-E2B-it](https://featherless.ai/models/google/gemma-4-E2B-it), and [Gemma4-31B-it](https://featherless.ai/models/google/gemma-4-31B-it).
+Provider records used for the frozen model metadata: [Qwen3.5-2B](https://featherless.ai/models/Qwen/Qwen3.5-2B), [Qwen3-32B](https://featherless.ai/models/Qwen/Qwen3-32B), [Gemma4-E2B-it](https://featherless.ai/models/google/gemma-4-E2B-it), and [Gemma4-31B-it](https://featherless.ai/models/google/gemma-4-31B-it).
 
 ## Factor balance
 
@@ -57,6 +57,12 @@ retention algorithm are held constant across setups. Retention uses two bounds:
 at most 100 messages and the runtime model context window. The first received
 event is always retained; when either bound is exceeded, the oldest event in
 the remaining tail is removed first.
+
+Qwen and Gemma run with provider thinking disabled. In realtime hotel chats,
+thinking could consume the entire output allowance without producing visible
+content. Claude Opus retains the native behavior of the closed Claude Code
+runtime and is therefore treated only as a closed-model reference, not as a
+compute-matched condition in the open-weight family-by-capacity comparisons.
 
 Context budgeting uses a common 32,768-token ceiling for every model condition.
 This is the maximum currently exposed by Featherless for all Qwen and Gemma

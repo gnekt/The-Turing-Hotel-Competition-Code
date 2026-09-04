@@ -37,7 +37,7 @@ EXPERIMENT_RESPONSE_RESERVE_TOKENS = 8_192
 MODEL_CONTEXT_TOKENS = {
     # One common ceiling prevents context capacity from becoming an additional
     # model-family confound. It is the largest value supported by every runtime.
-    "Qwen/Qwen3-0.6B": EXPERIMENT_CONTEXT_TOKENS,
+    "Qwen/Qwen3.5-2B": EXPERIMENT_CONTEXT_TOKENS,
     "Qwen/Qwen3-32B": EXPERIMENT_CONTEXT_TOKENS,
     "google/gemma-4-E2B-it": EXPERIMENT_CONTEXT_TOKENS,
     "google/gemma-4-31B-it": EXPERIMENT_CONTEXT_TOKENS,

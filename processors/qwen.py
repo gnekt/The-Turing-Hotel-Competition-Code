@@ -31,19 +31,18 @@ def _answer_only(response: str) -> str:
 
 
 def build(
-    model: str = "Qwen/Qwen3-0.6B",
+    model: str = "Qwen/Qwen3.5-2B",
     cost: int = 1,
     system_prompt: str = "",
     max_tokens: int = MAX_OUTPUT_TOKENS,
     temperature: float = 0.6,
     api_key: str = "",
 ) -> FeatherlessAPI:
-    """Build a Qwen 3 model with thinking enabled and answer-only output.
+    """Build a Qwen model in non-thinking mode for reliable realtime replies.
 
-    ``FeatherlessAPI`` already returns only ``message.content``; the separate
-    ``reasoning_content`` field is discarded inside the gateway. Qwen3 also
-    requires ordinary multi-turn history to contain final answers only, so
-    previous thinking is deliberately not preserved.
+    Featherless exposes reasoning separately from ``message.content``. With
+    thinking enabled, the model can exhaust the output budget before emitting
+    any content, so chat agents explicitly use the model's non-thinking mode.
     """
     return FeatherlessAPI(
         model=model,
@@ -54,14 +53,14 @@ def build(
         top_p=0.95,
         top_k=20,
         min_p=0.0,
-        sampler={"chat_template_kwargs": {"enable_thinking": True}},
+        sampler={"chat_template_kwargs": {"enable_thinking": False}},
         api_key=api_key,
     )
 
 
 class QwenAgent:
     def __init__(self, personas: str, effort: str, api_key: str,
-                 model: str = "Qwen/Qwen3-0.6B", cost: int = 1):
+                 model: str = "Qwen/Qwen3.5-2B", cost: int = 1):
         self.conversation = Conversation(
             keep=100,
             context_window_tokens=model_context_tokens(model),
@@ -71,8 +70,8 @@ class QwenAgent:
         )
         self.conv = self.conversation
         self.personas = personas
-        # Qwen 3 exposes a binary thinking switch, not reasoning-effort
-        # levels. Keep the shared constructor argument for interface parity.
+        # Keep the shared constructor argument for interface parity. Featherless
+        # agents run without thinking, so this value is not sent to the model.
         self.effort = effort
         self.api = build(model=model, cost=cost, system_prompt=personas, api_key=api_key)
 
