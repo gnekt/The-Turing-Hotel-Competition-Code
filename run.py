@@ -1,6 +1,7 @@
 import argparse
 import csv
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -10,18 +11,8 @@ from pathlib import Path
 # marked alive by the root server.
 os.environ.setdefault("NODE_IGNORE_ALIVE", "1")
 
-from unaiverse.agent import Agent
-from unaiverse.networking.node.node import Node
-
-from policies import build_policy
-from processors.gemma import GemmaAgent
-from processors.opus import OpusAgent
-from processors.qwen import QwenAgent
-from prompts import build_system_prompt
-
-
 WORLD = "jolly-mayer/TuringHotelItaly"
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parent
 SETUP_FILE = ROOT / "christian_compt_setup.csv"
 SETUP_FILES = {
     "20": SETUP_FILE,
@@ -31,6 +22,12 @@ SETUP_FILES = {
 LOGS_DIR = ROOT / "logs"
 STATE_DIR = LOGS_DIR / "state"
 ACCOUNT_KEY_FILE = ROOT / "account_key"
+FEATHERLESS_KEY_FILENAMES = (
+    "FEATHERLESS_API_KEYS",
+    "featherless_keys",
+    "featherles_keys",
+    "featherless_keys.txt",
+)
 DEFAULT_MODEL_IDS = {
     "Gemma 4 31B": "google/gemma-4-31B-it",
     "Gemma 4 E2B": "google/gemma-4-E2B-it",
@@ -41,10 +38,34 @@ DEFAULT_MODEL_IDS = {
 
 
 def load_account_key():
+    key_file = ACCOUNT_KEY_FILE
+    if not key_file.exists():
+        key_file = ROOT / "account_ket"
     try:
-        return ACCOUNT_KEY_FILE.read_text(encoding="utf-8").strip()
+        return key_file.read_text(encoding="utf-8").strip()
     except FileNotFoundError:
         return ""
+
+
+def resolve_featherless_keys(filename=None):
+    if filename is not None:
+        return Path(filename).expanduser().resolve()
+    for name in FEATHERLESS_KEY_FILENAMES:
+        candidate = ROOT / name
+        if candidate.is_file():
+            return candidate
+    raise ValueError(
+        "missing Featherless keys: place FEATHERLESS_API_KEYS or featherless_keys "
+        f"in {ROOT}, or pass the file path"
+    )
+
+
+def use_local_python():
+    """Reuse the project's installed dependencies without manual activation."""
+    venv = ROOT / ".venv"
+    python = venv / "bin" / "python"
+    if python.is_file() and Path(sys.prefix).resolve() != venv.resolve():
+        os.execv(str(python), [str(python), str(ROOT / "run.py"), *sys.argv[1:]])
 
 
 def save_account_key(account_key):
@@ -117,6 +138,15 @@ def state_file_for(config):
 
 
 def run_agent(config, featherless_key, unaiverse_key):
+    from unaiverse.agent import Agent
+    from unaiverse.networking.node.node import Node
+
+    from policies import build_policy
+    from processors.gemma import GemmaAgent
+    from processors.opus import OpusAgent
+    from processors.qwen import QwenAgent
+    from prompts import build_system_prompt
+
     llm = config["llm"]
     prompt = build_system_prompt(config)
     model_id = model_id_for(config)
@@ -248,7 +278,11 @@ def launch_agent(config, featherless_key, unaiverse_key, setup_file=SETUP_FILE):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("featherless_keys_file")
+    parser.add_argument(
+        "featherless_keys_file",
+        nargs="?",
+        help="Featherless keys file; discovered in the project directory by default",
+    )
     parser.add_argument(
         "unaiverse_key",
         nargs="?",
@@ -260,21 +294,34 @@ def main():
         help="setup alias (20, 50, 100) or CSV path; defaults to 20",
     )
     args = parser.parse_args()
+    use_local_python()
 
     setup_file = resolve_setup(args.setup)
-    unaiverse_key = args.unaiverse_key or load_account_key()
+    try:
+        unaiverse_key = args.unaiverse_key or load_account_key()
+    except OSError as error:
+        parser.error(str(error))
     if not unaiverse_key:
         parser.error(
-            "missing UNaIVERSE account key: pass unaiverse_key or save it with the TUI"
+            f"missing UNaIVERSE account key: place account_key in {ROOT} "
+            "or pass unaiverse_key"
         )
 
     try:
-        keys = load_featherless_keys(args.featherless_keys_file)
+        keys = load_featherless_keys(resolve_featherless_keys(args.featherless_keys_file))
     except (OSError, ValueError) as error:
         parser.error(str(error))
 
-    with setup_file.open(newline="", encoding="utf-8") as file:
-        configs = list(csv.DictReader(file))
+    try:
+        with setup_file.open(newline="", encoding="utf-8") as file:
+            configs = list(csv.DictReader(file))
+        if not configs:
+            raise ValueError(f"setup is empty: {setup_file}")
+    except (OSError, ValueError) as error:
+        parser.error(str(error))
+
+    if shutil.which("screen") is None:
+        parser.error("GNU screen is required; install it before launching the agents")
 
     try:
         for config in configs:
@@ -291,7 +338,8 @@ def main():
             time.sleep(16)
 
     print(f"Lancio completato: {started}/{len(configs)} sessioni attive.")
+    return 0 if started == len(configs) else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

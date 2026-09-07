@@ -3,6 +3,9 @@ logs/
 *.log
 account_key
 FEATHERLESS_API_KEYS
+account_ket
+featherless_keys
+featherles_keys
 # Tests kept locally for development
 tests/
 

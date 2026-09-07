@@ -70,6 +70,26 @@ The registered UNaIVERSE `node_name` is always `Agent Name (model_id)`, without 
 
 ## Selecting a setup
 
+Place `account_key` and `FEATHERLESS_API_KEYS` in the project directory, then run:
+
+```bash
+python run.py
+# Equivalent shorthand:
+python run
+```
+
+This launches the default 12-agent setup (`20`), discovers the credentials,
+uses the project's `.venv` automatically when present, and writes logs under
+`logs/`. Existing agent sessions are reused. Launches are spaced 16 seconds apart.
+The runtime dependencies (including UNaIVERSE) and GNU `screen` must already be
+installed; the launcher does not install system packages.
+The Featherless file may also be named `featherless_keys`, `featherles_keys`, or
+`featherless_keys.txt` (searched in that order after `FEATHERLESS_API_KEYS`).
+`account_ket` is accepted as a fallback for `account_key`.
+Paths are resolved relative to the project directory for automatic discovery.
+To select a larger setup without supplying credentials again, use
+`python run.py --setup 50` or `python run.py --setup 100`.
+
 The terminal launcher accepts the setup explicitly:
 
 ```bash
