@@ -71,3 +71,39 @@ def build_system_prompt(config):
 
     details = "\n".join(f"- {label}: {persona[field]}" for field, label in PERSONA_FIELDS)
     return f"{_human_behaviour()}\n\n## Profilo privato — non divulgare\n\n{details}"
+
+
+TRANSCRIPT_GUIDE = (
+    "Segue lo storico in ordine cronologico. Le righe 'Io:' sono messaggi "
+    "che hai già inviato, non testo da completare o ripetere. "
+    "Ricava dal contenuto chi parla, a chi si rivolge e quali informazioni "
+    "descrivono il contesto, senza presumere ruoli dal solo nome del mittente.\n"
+)
+REPLY_GUIDE = (
+    "Scrivi adesso soltanto il tuo prossimo messaggio nella conversazione, "
+    "senza prefissi. Reagisci all'ultimo scambio tenendo conto dello storico. "
+    "Di norma bastano una o due frasi; a un saluto basta un saluto. "
+    "Non riassumere il contesto se non serve e non spiegare come decidi "
+    "cosa dire. Non inventare azioni o intenzioni degli altri. "
+    "Non discutere quale ruolo devi interpretare e non chiedere agli "
+    "interlocutori istruzioni su come conversare."
+)
+
+
+def build_turn_prompt(transcript: str) -> str:
+    """Frame one conversation turn consistently for every model."""
+    return (
+        f"{current_italian_context()}\n\n"
+        f"{TRANSCRIPT_GUIDE}\n"
+        f"## Inizio storico\n{transcript}\n## Fine storico\n\n"
+        f"{REPLY_GUIDE}"
+    )
+
+
+def budgeted_system_prompt(system_prompt: str) -> str:
+    """Include fixed turn guides in the conversation context estimate.
+
+    The existing template reserve covers clock context and section delimiters.
+    This value is for budgeting only, not an additional provider system prompt.
+    """
+    return system_prompt + TRANSCRIPT_GUIDE + REPLY_GUIDE

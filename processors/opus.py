@@ -1,6 +1,4 @@
-import os
-
-from prompts import current_italian_context
+from prompts import budgeted_system_prompt, build_turn_prompt
 
 from utils import (
     Conversation,
@@ -16,7 +14,7 @@ class OpusAgent:
             keep=100,
             context_window_tokens=model_context_tokens("Claude Opus"),
             response_reserve_tokens=EXPERIMENT_RESPONSE_RESERVE_TOKENS,
-            system_prompt=personas,
+            system_prompt=budgeted_system_prompt(personas),
         )
         self.conv = self.conversation
         self.personas = personas
@@ -25,11 +23,7 @@ class OpusAgent:
     def __call__(self, message: str) -> str:
         try:
             self.conversation.add(message)
-            prompt = self.conversation.as_messages(
-                system=self.personas,
-                nudge=current_italian_context(),
-            )
-            prompt_text = "\n".join(f"{m['role']}: {m['content']}" for m in prompt)
+            prompt_text = f"system: {self.personas}\nuser: {build_turn_prompt(self.conversation.transcript())}"
             response = call_claude_prompt(prompt_text, model="opus", effort=self.effort)
             self.conversation.remember(response)
             return response

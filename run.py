@@ -293,6 +293,12 @@ def main():
         default="20",
         help="setup alias (20, 50, 100) or CSV path; defaults to 20",
     )
+    parser.add_argument(
+        "--provider",
+        choices=("claude", "featherless", "all"),
+        default="all",
+        help="which agents to launch; defaults to all",
+    )
     args = parser.parse_args()
     use_local_python()
 
@@ -308,17 +314,26 @@ def main():
         )
 
     try:
-        keys = load_featherless_keys(resolve_featherless_keys(args.featherless_keys_file))
-    except (OSError, ValueError) as error:
-        parser.error(str(error))
-
-    try:
         with setup_file.open(newline="", encoding="utf-8") as file:
             configs = list(csv.DictReader(file))
         if not configs:
             raise ValueError(f"setup is empty: {setup_file}")
     except (OSError, ValueError) as error:
         parser.error(str(error))
+
+    if args.provider == "claude":
+        configs = [config for config in configs if config["llm"].startswith("Claude")]
+    elif args.provider == "featherless":
+        configs = [config for config in configs if config["featherless_model_key"] != "NA"]
+    if not configs:
+        parser.error(f"no agents match provider '{args.provider}' in {setup_file}")
+
+    keys = {}
+    if any(config["featherless_model_key"] != "NA" for config in configs):
+        try:
+            keys = load_featherless_keys(resolve_featherless_keys(args.featherless_keys_file))
+        except (OSError, ValueError) as error:
+            parser.error(str(error))
 
     if shutil.which("screen") is None:
         parser.error("GNU screen is required; install it before launching the agents")

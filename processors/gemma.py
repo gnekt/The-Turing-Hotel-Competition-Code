@@ -8,7 +8,7 @@ from utils import (
     model_context_tokens,
     single_text_output,
 )
-from prompts import current_italian_context
+from prompts import budgeted_system_prompt, build_turn_prompt
 
 
 GEMMA_THOUGHT_BLOCK = re.compile(
@@ -64,7 +64,7 @@ class GemmaAgent:
             keep=100,
             context_window_tokens=model_context_tokens(model),
             response_reserve_tokens=EXPERIMENT_RESPONSE_RESERVE_TOKENS,
-            system_prompt=personas,
+            system_prompt=budgeted_system_prompt(personas),
             sensitive_values=(api_key,),
         )
         self.conv = self.conversation
@@ -77,8 +77,7 @@ class GemmaAgent:
     def __call__(self, message: str) -> str:
         try:
             self.conversation.add(message)
-            prompt = self.conversation.as_messages(nudge=current_italian_context())
-            prompt_text = "\n".join(f"{item['role']}: {item['content']}" for item in prompt)
+            prompt_text = build_turn_prompt(self.conversation.transcript())
             response = _answer_only(single_text_output(self.api(prompt_text)))
             self.conversation.remember(response)
             return response

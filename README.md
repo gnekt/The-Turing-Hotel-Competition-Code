@@ -90,6 +90,24 @@ Paths are resolved relative to the project directory for automatic discovery.
 To select a larger setup without supplying credentials again, use
 `python run.py --setup 50` or `python run.py --setup 100`.
 
+Choose which providers to launch with `--provider`:
+
+```bash
+python run --provider claude
+python run --provider featherless
+python run --provider all
+python run --setup 50 --provider featherless
+```
+
+The default is `all`. Selecting `claude` requires only the UNaIVERSE account key;
+the Featherless keys file is loaded only when selected agents use it. The filter
+applies to launches and does not stop any agents already running.
+
+All models receive the shared conversational instructions and their retained
+transcript. There is no Qwen-specific message routing, request classification,
+context selection, or corrective generation. Agents learn the situation from
+received messages; the processor has no Turing Hotel rules or sender-role mapping.
+
 The terminal launcher accepts the setup explicitly:
 
 ```bash
@@ -121,6 +139,17 @@ and Page Down to scroll, and `q` to return to the launcher. Snapshots are
 written atomically under the Git-ignored `logs/state/` directory and are never
 used as processor input. Runtime errors are redacted before being exposed; API
 and account credentials are never included in snapshots.
+
+To stop all competition agents, across every setup and provider:
+
+```bash
+python close_all.py
+```
+
+This closes the current user's attached and detached `competition_agent_<id>`
+screen sessions. It needs neither credentials nor Python packages. Other screen
+sessions and saved logs are preserved. Use `python close_all.py --dry-run` to
+preview the sessions. A failed stop is reported and returns a nonzero exit code.
 
 To stop every `competition_agent_*` screen and relaunch the complete 12-agent setup with all model families:
 
