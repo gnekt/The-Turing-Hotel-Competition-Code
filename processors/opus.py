@@ -2,6 +2,7 @@ from prompts import budgeted_system_prompt, build_turn_prompt
 
 from utils import (
     Conversation,
+    CLAUDE_MODEL_SELECTORS,
     EXPERIMENT_RESPONSE_RESERVE_TOKENS,
     call_claude_prompt,
     model_context_tokens,
@@ -11,7 +12,7 @@ from utils import (
 class OpusAgent:
     def __init__(self, personas: str, effort: str):
         self.conversation = Conversation(
-            keep=100,
+            keep=30,
             context_window_tokens=model_context_tokens("Claude Opus"),
             response_reserve_tokens=EXPERIMENT_RESPONSE_RESERVE_TOKENS,
             system_prompt=budgeted_system_prompt(personas),
@@ -24,7 +25,7 @@ class OpusAgent:
         try:
             self.conversation.add(message)
             prompt_text = f"system: {self.personas}\nuser: {build_turn_prompt(self.conversation.transcript())}"
-            response = call_claude_prompt(prompt_text, model="opus", effort=self.effort)
+            response = call_claude_prompt(prompt_text, model=CLAUDE_MODEL_SELECTORS["Claude Opus"], effort=self.effort)
             self.conversation.remember(response)
             return response
         except Exception as error:

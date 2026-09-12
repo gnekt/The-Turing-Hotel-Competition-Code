@@ -35,7 +35,7 @@ def build(
     cost: int = 2,
     system_prompt: str = "",
     max_tokens: int = EXPERIMENT_RESPONSE_RESERVE_TOKENS,
-    temperature: float = 1.0,
+    temperature: float = 1.1,
     api_key: str = "",
 ) -> FeatherlessAPI:
     """Build a Gemma 4 model in non-thinking mode for realtime replies.
@@ -51,7 +51,8 @@ def build(
         max_tokens=max_tokens,
         temperature=temperature,
         top_p=0.95,
-        top_k=64,
+        top_k=80,
+        repetition_penalty=1.05,
         sampler={"chat_template_kwargs": {"enable_thinking": False}},
         api_key=api_key,
     )
@@ -61,7 +62,7 @@ class GemmaAgent:
     def __init__(self, personas: str, effort: str, api_key: str,
                  model: str = "google/gemma-4-31B-it", cost: int = 2):
         self.conversation = Conversation(
-            keep=100,
+            keep=30,
             context_window_tokens=model_context_tokens(model),
             response_reserve_tokens=EXPERIMENT_RESPONSE_RESERVE_TOKENS,
             system_prompt=budgeted_system_prompt(personas),

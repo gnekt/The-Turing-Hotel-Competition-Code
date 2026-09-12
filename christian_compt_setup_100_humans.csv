@@ -1,61 +1,97 @@
 id,agent_name,competition_agnostic,llm,model_id,featherless_model_key,model_capacity,parameter_count,concurrency_cost,model_details,policy_type,policy_details,persona_info,persona_id,prompt_variant,design_cell,replicate_id,design_seed
 100001,Neo,yes,Gemma 4 31B,google/gemma-4-31B-it,chat2,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,GL_S_P,1,20261000
-100002,Jax,yes,Qwen 3 32B,Qwen/Qwen3-32B,agent_standard,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,QL_S_P,1,20261000
+100002,Jax,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,agent_standard,Large,27B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,QL_S_P,1,20261000
 100003,Mouse,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,C_S_P,1,20261000
+101003,Mouse-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,CH_S_P,1,20261000
+102003,Mouse-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,CS_S_P,1,20261000
+103003,Mouse-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,CF_S_P,1,20261000
 100004,Manabu,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,C_C_P,3,20261000
+101004,Manabu-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,CH_C_P,3,20261000
+102004,Manabu-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,CS_C_P,3,20261000
+103004,Manabu-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,CF_C_P,3,20261000
 100005,DeusExMachina,yes,Gemma 4 E2B,google/gemma-4-E2B-it,agent_standard,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GS_C_N,3,20261000
 100006,Apoc,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,C_C_P,1,20261000
-100007,Bugs,yes,Qwen 3 32B,Qwen/Qwen3-32B,agent_standard,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,QL_C_P,3,20261000
+101006,Apoc-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,CH_C_P,1,20261000
+102006,Apoc-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,CS_C_P,1,20261000
+103006,Apoc-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,CF_C_P,1,20261000
+100007,Bugs,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,agent_standard,Large,27B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,QL_C_P,3,20261000
 100008,Vector,yes,Gemma 4 E2B,google/gemma-4-E2B-it,agent_standard,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,GS_C_P,2,20261000
-100009,Kid,yes,Qwen 3 32B,Qwen/Qwen3-32B,agent_standard,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QL_S_N,2,20261000
+100009,Kid,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,agent_standard,Large,27B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QL_S_N,2,20261000
 100010,Persephone,yes,Gemma 4 31B,google/gemma-4-31B-it,agent_standard,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P5,persona,GL_C_P,2,20261000
 100011,Soren,yes,Gemma 4 E2B,google/gemma-4-E2B-it,agent_standard,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,GS_S_P,3,20261000
 100012,Binary,yes,Gemma 4 E2B,google/gemma-4-E2B-it,agent_standard,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GS_S_N,1,20261000
 100013,Rhineheart,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,agent_standard,Small,2B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,QS_C_P,2,20261000
 100014,Pudgy,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P5,persona,C_C_P,2,20261000
-100015,Lock,yes,Qwen 3 32B,Qwen/Qwen3-32B,agent_standard,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P3,persona,QL_C_P,2,20261000
-100016,Sati,yes,Qwen 3 32B,Qwen/Qwen3-32B,agent_standard,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,QL_S_P,2,20261000
+101014,Pudgy-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P5,persona,CH_C_P,2,20261000
+102014,Pudgy-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P5,persona,CS_C_P,2,20261000
+103014,Pudgy-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P5,persona,CF_C_P,2,20261000
+100015,Lock,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,agent_standard,Large,27B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P3,persona,QL_C_P,2,20261000
+100016,Sati,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,agent_standard,Large,27B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,QL_S_P,2,20261000
 100017,Roland,yes,Gemma 4 31B,google/gemma-4-31B-it,agent_standard,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,GL_C_P,3,20261000
 100018,Axel,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,C_C_N,2,20261000
+101018,Axel-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,CH_C_N,2,20261000
+102018,Axel-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,CS_C_N,2,20261000
+103018,Axel-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,CF_C_N,2,20261000
 100019,Duo,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,agent_standard,Small,2B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QS_C_N,2,20261000
 100020,Dozer,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat1,Small,2B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QS_C_N,1,20261000
 100021,AgentBrown,yes,Gemma 4 31B,google/gemma-4-31B-it,agent_standard,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,GL_S_P,2,20261000
 100022,Cas,yes,Gemma 4 E2B,google/gemma-4-E2B-it,chat4,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona,GS_C_P,1,20261000
 100023,Tank,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat1,Small,2B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P4,persona,QS_C_P,1,20261000
 100024,Tom,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,C_S_N,2,20261000
+101024,Tom-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,CH_S_N,2,20261000
+102024,Tom-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,CS_S_N,2,20261000
+103024,Tom-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,CF_S_N,2,20261000
 100025,Oracle,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat1,Small,2B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona,QS_S_P,1,20261000
-100026,Keymaker,yes,Qwen 3 32B,Qwen/Qwen3-32B,chat4,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QL_S_N,1,20261000
-100027,Analyst,yes,Qwen 3 32B,Qwen/Qwen3-32B,chat1,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QL_C_N,2,20261000
+100026,Keymaker,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,chat4,Large,27B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QL_S_N,1,20261000
+100027,Analyst,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,chat1,Large,27B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QL_C_N,2,20261000
 100028,AgentJones,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,C_C_N,1,20261000
+101028,AgentJones-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,CH_C_N,1,20261000
+102028,AgentJones-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,CS_C_N,1,20261000
+103028,AgentJones-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,CF_C_N,1,20261000
 100029,DuJour,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,agent_standard,Small,2B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QS_S_N,2,20261000
 100030,Yoko,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,C_S_N,3,20261000
+101030,Yoko-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,CH_S_N,3,20261000
+102030,Yoko-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,CS_S_N,3,20261000
+103030,Yoko-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,CF_S_N,3,20261000
 100031,Zee,yes,Gemma 4 E2B,google/gemma-4-E2B-it,chat1,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P3,persona,GS_C_P,3,20261000
 100032,Masa,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat1,Small,2B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P1,persona,QS_S_P,2,20261000
 100033,Morpheus,yes,Gemma 4 31B,google/gemma-4-31B-it,chat3,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,GL_C_P,1,20261000
-100034,Maggie,yes,Qwen 3 32B,Qwen/Qwen3-32B,chat4,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QL_C_N,1,20261000
+100034,Maggie,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,chat4,Large,27B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QL_C_N,1,20261000
 100035,Merovingian,yes,Gemma 4 31B,google/gemma-4-31B-it,chat1,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,GL_S_P,3,20261000
 100036,TwinOne,yes,Gemma 4 E2B,google/gemma-4-E2B-it,chat2,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GS_S_N,2,20261000
 100037,Kaiser,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat2,Small,2B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QS_C_N,3,20261000
 100038,TwinTwo,yes,Gemma 4 E2B,google/gemma-4-E2B-it,chat2,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GS_S_N,3,20261000
-100039,Jue,yes,Qwen 3 32B,Qwen/Qwen3-32B,chat2,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QL_C_N,3,20261000
-100040,Link,yes,Qwen 3 32B,Qwen/Qwen3-32B,chat3,Large,32.8B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,QL_C_P,1,20261000
+100039,Jue,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,chat2,Large,27B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,QL_C_N,3,20261000
+100040,Link,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,chat3,Large,27B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P2,persona,QL_C_P,1,20261000
 100041,Niobe,yes,Gemma 4 31B,google/gemma-4-31B-it,chat3,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GL_S_N,3,20261000
 100042,Trinity,yes,Gemma 4 31B,google/gemma-4-31B-it,chat2,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GL_S_N,1,20261000
 100043,Ballard,yes,Gemma 4 E2B,google/gemma-4-E2B-it,chat2,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,GS_S_P,1,20261000
-100044,Sparks,yes,Qwen 3 32B,Qwen/Qwen3-32B,chat3,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,QL_S_P,3,20261000
-100045,Trainman,yes,Qwen 3 32B,Qwen/Qwen3-32B,chat3,Large,32.8B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QL_S_N,3,20261000
+100044,Sparks,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,chat3,Large,27B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,QL_S_P,3,20261000
+100045,Trainman,yes,Qwen 3.5 27B,Qwen/Qwen3.5-27B,chat3,Large,27B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QL_S_N,3,20261000
 100046,Choi,yes,Gemma 4 31B,google/gemma-4-31B-it,agent_standard,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GL_C_N,2,20261000
 100047,Architect,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona,C_S_P,2,20261000
+101047,Architect-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona,CH_S_P,2,20261000
+102047,Architect-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona,CS_S_P,2,20261000
+103047,Architect-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P3,persona,CF_S_P,2,20261000
 100048,Seraph,yes,Gemma 4 31B,google/gemma-4-31B-it,chat3,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GL_C_N,3,20261000
 100049,AgentSmith,yes,Gemma 4 31B,google/gemma-4-31B-it,chat3,Large,30.7B,2,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GL_C_N,1,20261000
 100050,Misha,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,C_C_N,3,20261000
+101050,Misha-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,CH_C_N,3,20261000
+102050,Misha-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,CS_C_N,3,20261000
+103050,Misha-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,CF_C_N,3,20261000
 100051,Sara,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat4,Small,2B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P2,persona,QS_S_P,3,20261000
 100052,Bane,yes,Gemma 4 E2B,google/gemma-4-E2B-it,chat4,Small,2.3B effective,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona,GS_S_P,2,20261000
 100053,Thadeus,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat4,Small,2B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QS_S_N,3,20261000
 100054,Switch,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,C_S_N,1,20261000
+101054,Switch-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,CH_S_N,1,20261000
+102054,Switch-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,CS_S_N,1,20261000
+103054,Switch-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,CF_S_N,1,20261000
 100055,Ghost,yes,Gemma 4 E2B,google/gemma-4-E2B-it,chat2,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GS_C_N,1,20261000
 100056,Cis,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat4,Small,2B,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P3,persona,QS_C_P,3,20261000
 100057,Cypher,yes,Qwen 3.5 2B,Qwen/Qwen3.5-2B,chat1,Small,2B,1,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,QS_S_N,1,20261000
 100058,CouncillorHamann,yes,Gemma 4 E2B,google/gemma-4-E2B-it,chat3,Small,2.3B effective,1,Open,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona,GS_C_N,2,20261000
 100059,Dan,yes,Claude Opus,Claude Opus,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,C_S_P,3,20261000
+101059,Dan-Haiku,yes,Claude Haiku,Claude Haiku,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,CH_S_P,3,20261000
+102059,Dan-Sonnet,yes,Claude Sonnet,Claude Sonnet,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,CS_S_P,3,20261000
+103059,Dan-Fable,yes,Claude Fable,Claude Fable,NA,Large,Undisclosed,NA,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P4,persona,CF_S_P,3,20261000
 100060,Mifune,yes,Gemma 4 31B,google/gemma-4-31B-it,chat4,Large,30.7B,2,Open,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona,GL_S_N,2,20261000

@@ -59,10 +59,11 @@ def current_italian_context(now=None):
 
 def build_system_prompt(config):
     """Combine the shared human behaviour with the agent's optional persona."""
+    instructions = _human_behaviour()
     persona_id = config.get("persona_id", "").strip()
     if not persona_id:
         details = "\n".join(f"- {label}: Not defined" for _, label in PERSONA_FIELDS)
-        return f"{_human_behaviour()}\n\n## Profilo privato — non divulgare\n\n{details}"
+        return f"{instructions}\n\n## Profilo privato — non divulgare\n\n{details}"
 
     try:
         persona = _personas()[persona_id]
@@ -70,23 +71,20 @@ def build_system_prompt(config):
         raise ValueError(f"Unknown persona_id: {persona_id}") from error
 
     details = "\n".join(f"- {label}: {persona[field]}" for field, label in PERSONA_FIELDS)
-    return f"{_human_behaviour()}\n\n## Profilo privato — non divulgare\n\n{details}"
+    return f"{instructions}\n\n## Profilo privato — non divulgare\n\n{details}"
 
 
 TRANSCRIPT_GUIDE = (
-    "Segue lo storico in ordine cronologico. Le righe 'Io:' sono messaggi "
+    "Segue lo storico in ordine cronologico. Le righe 'Tu (questo agente):' sono messaggi "
     "che hai già inviato, non testo da completare o ripetere. "
     "Ricava dal contenuto chi parla, a chi si rivolge e quali informazioni "
     "descrivono il contesto, senza presumere ruoli dal solo nome del mittente.\n"
 )
 REPLY_GUIDE = (
-    "Scrivi adesso soltanto il tuo prossimo messaggio nella conversazione, "
-    "senza prefissi. Reagisci all'ultimo scambio tenendo conto dello storico. "
-    "Di norma bastano una o due frasi; a un saluto basta un saluto. "
-    "Non riassumere il contesto se non serve e non spiegare come decidi "
-    "cosa dire. Non inventare azioni o intenzioni degli altri. "
-    "Non discutere quale ruolo devi interpretare e non chiedere agli "
-    "interlocutori istruzioni su come conversare."
+    "Scrivi soltanto il tuo prossimo messaggio, senza etichette o commenti esterni. "
+    "Reagisci allo scambio in corso: anche una sola parola può bastare, "
+    "senza doverla completare con spiegazioni o domande. "
+    "Se hai qualcosa da sviluppare, usa lo spazio che serve."
 )
 
 

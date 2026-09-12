@@ -38,10 +38,13 @@ MODEL_CONTEXT_TOKENS = {
     # One common ceiling prevents context capacity from becoming an additional
     # model-family confound. It is the largest value supported by every runtime.
     "Qwen/Qwen3.5-2B": EXPERIMENT_CONTEXT_TOKENS,
-    "Qwen/Qwen3-32B": EXPERIMENT_CONTEXT_TOKENS,
+    "Qwen/Qwen3.5-27B": EXPERIMENT_CONTEXT_TOKENS,
     "google/gemma-4-E2B-it": EXPERIMENT_CONTEXT_TOKENS,
     "google/gemma-4-31B-it": EXPERIMENT_CONTEXT_TOKENS,
     "Claude Opus": EXPERIMENT_CONTEXT_TOKENS,
+    "Claude Haiku": EXPERIMENT_CONTEXT_TOKENS,
+    "Claude Sonnet": EXPERIMENT_CONTEXT_TOKENS,
+    "Claude Fable": EXPERIMENT_CONTEXT_TOKENS,
 }
 CONTEXT_TEMPLATE_RESERVE_TOKENS = 512
 
@@ -85,7 +88,8 @@ class Conversation:
         speaker_pattern: Pattern with speaker and text groups, applied to each
             event. Unmatched events keep their full text with an empty speaker.
             Supply another pattern for worlds with a different format.
-        me: Label used for local replies in the transcript.
+        me: Label used for local replies in the transcript. The default marks
+            the responding agent explicitly, independently of its room alias.
         reset_rules: Callables that receive one raw event and return True when
             the rotating tail should be cleared. By default, common Italian and
             English requests to start a new conversation or clear context match.
@@ -102,7 +106,7 @@ class Conversation:
     processor turn to policies or other cooperating components.
     """
 
-    def __init__(self, keep: int = 80, speaker_pattern: str = SPEAKER, me: str = "Io",
+    def __init__(self, keep: int = 30, speaker_pattern: str = SPEAKER, me: str = "Tu (questo agente)",
                  reset_rules=DEFAULT_RESET_RULES, snapshot_file=None,
                  context_window_tokens: int = 0, response_reserve_tokens: int = 0,
                  system_prompt: str = "", sensitive_values=()):
@@ -372,9 +376,9 @@ class Conversation:
     def transcript(self, limit: int | None = None) -> str:
         """Render up to `limit` recent messages as `Speaker: text` entries.
 
-        Local replies use `me`, and events without a sender use `?`. A limit
-        of ``None`` or 0 includes the entire history. A positive limit still
-        includes the fixed first message.
+        Local replies use `me`; events without a sender retain their text
+        without an added label. A limit of ``None`` or 0 includes the entire
+        history. A positive limit still includes the fixed first message.
         """
         if not limit or len(self.history) <= limit:
             messages = self.history
@@ -382,8 +386,11 @@ class Conversation:
             messages = self.history[:1]
         else:
             messages = self.history[:1] + self.history[-(limit - 1):]
-        return "\n".join(f"{self.me if m.mine else (m.speaker or '?')}: {m.text}"
-                         for m in messages)
+        entries = []
+        for message in messages:
+            speaker = self.me if message.mine else message.speaker
+            entries.append(f"{speaker}: {message.text}" if speaker else message.text)
+        return "\n".join(entries)
 
     def as_messages(self, system: str = "", nudge: str = "") -> list[dict]:
         """Render the transcript as one neutral user message.
@@ -402,6 +409,14 @@ class Conversation:
         out.append({"role": "user", "content": content})
         return out
 
+
+
+CLAUDE_MODEL_SELECTORS = {
+    "Claude Haiku": "haiku",
+    "Claude Sonnet": "sonnet",
+    "Claude Opus": "opus",
+    "Claude Fable": "claude-fable-5-1",
+}
 
 
 def call_claude_prompt(input: str, model: str = "sonnet", effort: str = "medium", timeout: int = 300) -> str:

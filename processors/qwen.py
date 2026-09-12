@@ -35,7 +35,7 @@ def build(
     cost: int = 1,
     system_prompt: str = "",
     max_tokens: int = MAX_OUTPUT_TOKENS,
-    temperature: float = 0.6,
+    temperature: float = 0.9,
     api_key: str = "",
 ) -> FeatherlessAPI:
     """Build a Qwen model in non-thinking mode for reliable realtime replies.
@@ -51,7 +51,8 @@ def build(
         max_tokens=max_tokens,
         temperature=temperature,
         top_p=0.95,
-        top_k=20,
+        top_k=50,
+        repetition_penalty=1.05,
         min_p=0.0,
         sampler={"chat_template_kwargs": {"enable_thinking": False}},
         api_key=api_key,
@@ -62,7 +63,7 @@ class QwenAgent:
     def __init__(self, personas: str, effort: str, api_key: str,
                  model: str = "Qwen/Qwen3.5-2B", cost: int = 1):
         self.conversation = Conversation(
-            keep=100,
+            keep=30,
             context_window_tokens=model_context_tokens(model),
             response_reserve_tokens=MAX_OUTPUT_TOKENS,
             system_prompt=budgeted_system_prompt(personas),

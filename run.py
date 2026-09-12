@@ -28,12 +28,17 @@ FEATHERLESS_KEY_FILENAMES = (
     "featherles_keys",
     "featherless_keys.txt",
 )
+from utils import CLAUDE_MODEL_SELECTORS
+
 DEFAULT_MODEL_IDS = {
     "Gemma 4 31B": "google/gemma-4-31B-it",
     "Gemma 4 E2B": "google/gemma-4-E2B-it",
-    "Qwen 3 32B": "Qwen/Qwen3-32B",
+    "Qwen 3.5 27B": "Qwen/Qwen3.5-27B",
     "Qwen 3.5 2B": "Qwen/Qwen3.5-2B",
     "Claude Opus": "Claude Opus",
+    "Claude Haiku": "Claude Haiku",
+    "Claude Sonnet": "Claude Sonnet",
+    "Claude Fable": "Claude Fable",
 }
 
 
@@ -144,12 +149,15 @@ def run_agent(config, featherless_key, unaiverse_key):
     from policies import build_policy
     from processors.gemma import GemmaAgent
     from processors.opus import OpusAgent
+    from processors.haiku import HaikuAgent
+    from processors.sonnet import SonnetAgent
+    from processors.fable import FableAgent
     from processors.qwen import QwenAgent
     from prompts import build_system_prompt
 
     llm = config["llm"]
-    prompt = build_system_prompt(config)
     model_id = model_id_for(config)
+    prompt = build_system_prompt(config)
     cost_value = config.get("concurrency_cost", "").strip()
 
     if llm.startswith("Gemma"):
@@ -168,8 +176,14 @@ def run_agent(config, featherless_key, unaiverse_key):
             model=model_id or "Qwen/Qwen3.5-2B",
             cost=int(cost_value or 1),
         )
+    elif llm in CLAUDE_MODEL_SELECTORS:
+        classes = {"Claude Haiku": HaikuAgent, "Claude Sonnet": SonnetAgent,
+                   "Claude Opus": OpusAgent, "Claude Fable": FableAgent}
+        if model_id != llm:
+            raise ValueError(f"Unsupported Claude model ID: {model_id}")
+        processor = classes[llm](prompt, "medium")
     else:
-        processor = OpusAgent(prompt, "medium")
+        raise ValueError(f"Unsupported model configuration: {llm}")
 
     agent = Agent(
         proc=processor,
