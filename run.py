@@ -290,8 +290,179 @@ def launch_agent(config, featherless_key, unaiverse_key, setup_file=SETUP_FILE):
     return True
 
 
-def main():
-    parser = argparse.ArgumentParser()
+def restart_agent(config, featherless_key, unaiverse_key, setup_file=SETUP_FILE):
+    """Wait for the old screen session to disappear before reusing its identity."""
+    session_name = f"competition_agent_{config['id']}"
+    if session_is_running(session_name):
+        if not stop_agent(config):
+            return False
+        for _ in range(40):
+            if not session_is_running(session_name):
+                break
+            time.sleep(0.25)
+        else:
+            print(f"Cannot restart {node_name_for(config)}: session is still running.", flush=True)
+            return False
+    return launch_agent(config, featherless_key, unaiverse_key, setup_file)
+
+
+def select_configs(configs, provider, agents=None):
+    if provider == "claude":
+        configs = [config for config in configs if config["llm"].startswith("Claude")]
+    elif provider == "featherless":
+        configs = [config for config in configs if config["featherless_model_key"] != "NA"]
+    if not configs:
+        raise ValueError(f"no agents match provider '{provider}'")
+    if not agents:
+        return configs
+
+    selected_ids = set()
+    for selector in agents:
+        selector = selector.strip()
+        matches = [config for config in configs if config["id"] == selector]
+        if not matches:
+            matches = [config for config in configs if config["agent_name"].casefold() == selector.casefold()]
+        if not matches:
+            raise ValueError(f"agent '{selector}' not found in the selected setup/provider; use --list")
+        if len(matches) != 1:
+            raise ValueError(f"ambiguous agent '{selector}'; select a unique ID")
+        selected_ids.add(matches[0]["id"])
+    return [config for config in configs if config["id"] in selected_ids]
+
+
+def agent_label(config, sessions):
+    status = "running" if f"competition_agent_{config['id']}" in sessions else "stopped"
+    return (
+        f"#{config['id']}  {node_name_for(config)} | {status} | "
+        f"{config['policy_type']} | persona: {config['persona_info']}"
+    )
+
+
+def choose_menu(title, options, default=None):
+    """A line-oriented menu that also works without a full-screen terminal."""
+    print(f"\n{title}")
+    default_number = None
+    for number, (value, label) in enumerate(options, start=1):
+        marker = " [default]" if value == default else ""
+        print(f"{number}) {label}{marker}")
+        if value == default:
+            default_number = number
+    print("0) Exit")
+    while True:
+        answer = input("Choice: ").strip()
+        if not answer and default_number is not None:
+            answer = str(default_number)
+        if answer == "0":
+            return None
+        if answer.isascii() and answer.isdecimal() and 1 <= int(answer) <= len(options):
+            return options[int(answer) - 1][0]
+        print(f"Enter a number from 0 to {len(options)}.")
+
+
+def configure_interactively(args):
+    args.action = choose_menu("What would you like to do?", [
+        ("launch", "Launch agents (keep existing sessions)"),
+        ("restart", "Restart agents (launch them if stopped)"),
+        ("stop", "Stop agents"),
+        ("list", "List configured agents and session status"),
+    ], default=args.action)
+    if args.action is None:
+        return False
+    setup_options = [(alias, f"Setup {alias}: {path.name}") for alias, path in SETUP_FILES.items()]
+    if args.setup not in SETUP_FILES:
+        setup_options.insert(0, (args.setup, f"Current setup: {args.setup}"))
+    setup_options.append(("custom", "Another CSV file"))
+    setup = choose_menu("Which configuration?", setup_options, default=args.setup)
+    if setup is None:
+        return False
+    if setup == "custom":
+        setup = input("CSV path (empty to exit): ").strip()
+        if not setup:
+            return False
+    args.setup = setup
+    args.provider = choose_menu("Which providers?", [
+        ("all", "All providers"),
+        ("claude", "Claude only"),
+        ("featherless", "Featherless only"),
+    ], default=args.provider)
+    return args.provider is not None
+
+
+def execute(args):
+    if args.tui and not configure_interactively(args):
+        return 0
+    setup_file = resolve_setup(args.setup)
+    with setup_file.open(newline="", encoding="utf-8") as file:
+        configs = list(csv.DictReader(file))
+    if not configs:
+        raise ValueError(f"setup is empty: {setup_file}")
+    configs = select_configs(configs, args.provider, args.agent)
+
+    if shutil.which("screen") is None:
+        raise ValueError("GNU screen is required; install it before managing the agents")
+
+    if args.action == "list":
+        sessions = running_session_names()
+        print(f"Setup: {setup_file}")
+        for config in configs:
+            print(agent_label(config, sessions))
+        return 0
+
+    if args.tui:
+        sessions = running_session_names()
+        options = [("all", f"All {len(configs)} selected agents")]
+        options.extend((config["id"], agent_label(config, sessions)) for config in configs)
+        selected = choose_menu(f"Which agents to {args.action}?", options)
+        if selected is None:
+            return 0
+        if selected != "all":
+            configs = select_configs(configs, "all", [selected])
+
+    if args.action == "stop":
+        stopped = 0
+        for config in configs:
+            if not session_is_running(f"competition_agent_{config['id']}"):
+                print(f"{node_name_for(config)} is already stopped.")
+                stopped += 1
+            else:
+                stopped += stop_agent(config)
+        print(f"Stop completed: {stopped}/{len(configs)} sessions stopped.")
+        return 0 if stopped == len(configs) else 1
+
+    unaiverse_key = args.unaiverse_key or load_account_key()
+    if not unaiverse_key:
+        raise ValueError(
+            f"missing UNaIVERSE account key: place account_key in {ROOT} "
+            "or pass unaiverse_key"
+        )
+
+    keys = {}
+    if any(config["featherless_model_key"] != "NA" for config in configs):
+        keys = load_featherless_keys(resolve_featherless_keys(args.featherless_keys_file))
+
+    # Validate every selected credential and identity before stopping any agent.
+    for config in configs:
+        featherless_key_for(config, keys)
+        node_name_for(config)
+
+    LOGS_DIR.mkdir(exist_ok=True)
+    started = 0
+    operation = restart_agent if args.action == "restart" else launch_agent
+    for index, config in enumerate(configs):
+        key = featherless_key_for(config, keys)
+        started += operation(config, key, unaiverse_key, setup_file)
+        if index < len(configs) - 1:
+            time.sleep(16)
+
+    print(f"Lancio completato: {started}/{len(configs)} sessioni attive.")
+    return 0 if started == len(configs) else 1
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Launch and manage agents from a setup CSV. Default: launch all, keeping existing sessions.",
+        epilog="Examples: python run.py --agent 3; python run.py --agent Neo --restart; python run.py --tui",
+    )
     parser.add_argument(
         "featherless_keys_file",
         nargs="?",
@@ -311,63 +482,42 @@ def main():
         "--provider",
         choices=("claude", "featherless", "all"),
         default="all",
-        help="which agents to launch; defaults to all",
+        help="which agents to manage; defaults to all",
     )
-    args = parser.parse_args()
-    use_local_python()
-
-    setup_file = resolve_setup(args.setup)
+    parser.add_argument(
+        "--agent",
+        action="append",
+        metavar="ID_OR_NAME",
+        help="select an agent by ID or exact name (case-insensitive); repeat to select more",
+    )
+    actions = parser.add_mutually_exclusive_group()
+    actions.add_argument(
+        "--restart", dest="action", action="store_const", const="restart",
+        help="restart selected agents, launching any that are stopped; without --agent, applies to all matches",
+    )
+    actions.add_argument(
+        "--stop", dest="action", action="store_const", const="stop",
+        help="stop selected agents; without --agent, applies to all matches (no credentials needed)",
+    )
+    actions.add_argument(
+        "--list", dest="action", action="store_const", const="list",
+        help="list configured agents and screen session status (no credentials needed)",
+    )
+    parser.set_defaults(action="launch")
+    parser.add_argument("--tui", action="store_true", help="choose an operation with simple numbered menus")
+    args = parser.parse_args(argv)
+    if argv is None:
+        use_local_python()
     try:
-        unaiverse_key = args.unaiverse_key or load_account_key()
-    except OSError as error:
-        parser.error(str(error))
-    if not unaiverse_key:
-        parser.error(
-            f"missing UNaIVERSE account key: place account_key in {ROOT} "
-            "or pass unaiverse_key"
-        )
-
-    try:
-        with setup_file.open(newline="", encoding="utf-8") as file:
-            configs = list(csv.DictReader(file))
-        if not configs:
-            raise ValueError(f"setup is empty: {setup_file}")
+        return execute(args)
     except (OSError, ValueError) as error:
         parser.error(str(error))
-
-    if args.provider == "claude":
-        configs = [config for config in configs if config["llm"].startswith("Claude")]
-    elif args.provider == "featherless":
-        configs = [config for config in configs if config["featherless_model_key"] != "NA"]
-    if not configs:
-        parser.error(f"no agents match provider '{args.provider}' in {setup_file}")
-
-    keys = {}
-    if any(config["featherless_model_key"] != "NA" for config in configs):
-        try:
-            keys = load_featherless_keys(resolve_featherless_keys(args.featherless_keys_file))
-        except (OSError, ValueError) as error:
-            parser.error(str(error))
-
-    if shutil.which("screen") is None:
-        parser.error("GNU screen is required; install it before launching the agents")
-
-    try:
-        for config in configs:
-            featherless_key_for(config, keys)
-    except ValueError as error:
-        parser.error(str(error))
-
-    LOGS_DIR.mkdir(exist_ok=True)
-    started = 0
-    for index, config in enumerate(configs):
-        key = featherless_key_for(config, keys)
-        started += launch_agent(config, key, unaiverse_key, setup_file)
-        if index < len(configs) - 1:
-            time.sleep(16)
-
-    print(f"Lancio completato: {started}/{len(configs)} sessioni attive.")
-    return 0 if started == len(configs) else 1
+    except EOFError:
+        print("\nCancelled.")
+        return 0
+    except KeyboardInterrupt:
+        print("\nInterrupted. Existing screen sessions remain running.")
+        return 130
 
 
 if __name__ == "__main__":
