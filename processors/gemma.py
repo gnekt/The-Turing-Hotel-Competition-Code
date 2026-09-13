@@ -62,7 +62,7 @@ class GemmaAgent:
     def __init__(self, personas: str, effort: str, api_key: str,
                  model: str = "google/gemma-4-31B-it", cost: int = 2):
         self.conversation = Conversation(
-            keep=30,
+            keep=80,
             context_window_tokens=model_context_tokens(model),
             response_reserve_tokens=EXPERIMENT_RESPONSE_RESERVE_TOKENS,
             system_prompt=budgeted_system_prompt(personas),

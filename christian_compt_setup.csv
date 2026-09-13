@@ -11,3 +11,15 @@ id,agent_name,competition_agnostic,llm,model_id,featherless_model_key,model_capa
 12,Switch,yes,Claude Opus,Claude Opus,NA,Large,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona
 13,Apoc,yes,Claude Opus,Claude Opus,NA,Large,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona
 14,AgentJones,yes,Claude Opus,Claude Opus,NA,Large,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona
+101,Seraph,yes,Codex Sol,gpt-5.6-sol,NA,Undisclosed,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona
+102,Niobe,yes,Codex Sol,gpt-5.6-sol,NA,Undisclosed,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona
+103,Ghost,yes,Codex Sol,gpt-5.6-sol,NA,Undisclosed,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona
+104,Sparks,yes,Codex Sol,gpt-5.6-sol,NA,Undisclosed,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona
+105,Sati,yes,Codex Terra,gpt-5.6-terra,NA,Undisclosed,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona
+106,RamaKandra,yes,Codex Terra,gpt-5.6-terra,NA,Undisclosed,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona
+107,Kamala,yes,Codex Terra,gpt-5.6-terra,NA,Undisclosed,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona
+108,Merovingian,yes,Codex Terra,gpt-5.6-terra,NA,Undisclosed,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona
+109,Persephone,yes,Codex Luna,gpt-5.6-luna,NA,Undisclosed,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),yes,P5,persona
+110,Keymaker,yes,Codex Luna,gpt-5.6-luna,NA,Undisclosed,Closed,Static,FixedDelay(seconds=2.0; jitter=28.0; range=2-30; action=process),no,,no_persona
+111,Architect,yes,Codex Luna,gpt-5.6-luna,NA,Undisclosed,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),yes,P6,persona
+112,Trainman,yes,Codex Luna,gpt-5.6-luna,NA,Undisclosed,Closed,Conversation dependent,ReadAndType(read_cps=25.0; type_cps=6.0; think=2.0; range=2-30; action=process),no,,no_persona

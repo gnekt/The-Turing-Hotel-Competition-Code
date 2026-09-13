@@ -3,8 +3,8 @@
 ## Files
 
 - christian_compt_setup.csv contains one row for each configured agent in this scope.
-- christian_compt_setup_50_humans.csv contains 48 agents for approximately 50 active humans.
-- christian_compt_setup_100_humans.csv contains 96 agents for approximately 100 active humans.
+- christian_compt_setup_50_humans.csv contains 60 agents; `50` remains its historical preset alias.
+- christian_compt_setup_100_humans.csv contains 120 agents; `100` remains its historical preset alias.
 - turing_personas.csv contains the reusable balanced persona pool for this scope.
 - human_behaviour.md contains the shared human-like conversational behaviour used by every processor.
 - prompts.py combines the shared behaviour with the optional persona at launch time.
@@ -93,12 +93,13 @@ Choose which providers to launch with `--provider`:
 
 ```bash
 python run --provider claude
+python run --provider codex
 python run --provider featherless
 python run --provider all
 python run --setup 50 --provider featherless
 ```
 
-The default is `all`. Selecting `claude` requires only the UNaIVERSE account key;
+The default is `all`. Selecting `claude` or `codex` requires only the UNaIVERSE account key plus the corresponding authenticated CLI;
 the Featherless keys file is loaded only when selected agents use it. The filter
 applies to launches and does not stop any agents already running.
 
@@ -159,14 +160,18 @@ To stop every `competition_agent_*` screen and relaunch the complete 24-agent se
 ```
 
 
-### Claude variants in every setup
+### Model variants by setup
 
-All setups include Claude Haiku, Sonnet, Opus and Fable. The 20/50/100-human presets now launch 24/48/96 agents respectively, with 4/6/12 agents per Claude variant. New variants preserve the Opus persona and policy combinations; existing agents and Featherless assignments are unchanged. The previous agent/human density no longer applies.
+The base preset (`20`) launches 24 agents: four each for Gemma 4 31B, Qwen 3.5 2B, Claude Opus, Codex Sol, Codex Terra and Codex Luna. Each model covers both timing policies with and without a persona. Codex agents use IDs 101–112 and copy the existing Opus persona assignments (P5/P6). The `50` and `100` presets now contain 60 and 120 agents respectively, with 6 and 12 agents for each of the ten model variants, including Codex Sol, Terra and Luna. The aliases and CSV filenames are retained for compatibility; they do not indicate agent counts. Each Codex variant reproduces the corresponding Opus persona, timing-policy and replicate assignments. Fable is excluded from all presets. New rows are appended without changing the remaining identities or their relative launch order, with names suffixed by Sol/Terra/Luna, IDs offset from Opus by 4000/5000/6000, and design-cell prefixes CXS/CXT/CXL. The smaller preset remains nested in the larger by agent name and experimental assignment.
 
-`--provider claude` selects all four Claude variants. Haiku, Sonnet and Opus use the corresponding Claude Code aliases; Fable uses `claude-fable-5-1`. All four share the same 32768-token context budget, 8192-token output reserve, 30-message retention and conversation guides. Claude Code must be authenticated with access to each selected model. Configuration and routing are tested offline; account access is not implied.
+`--provider codex` selects all three Codex variants. They use `gpt-5.6-sol`, `gpt-5.6-terra` and `gpt-5.6-luna`, respectively, from the [official OpenAI model catalog](https://developers.openai.com/api/docs/models). Install the Codex CLI and authenticate with `codex login` using an account with access to these models. Each reply runs a fresh `codex exec` with medium reasoning effort and the shared prompt/transcript; only the final answer file is published. The CLI runs ephemerally in a temporary directory, ignores user configuration, disables shell and web search, and uses a read-only sandbox. The installed CLI must support `--ignore-user-config` and `--ephemeral`. See [Codex non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode).
+
+Codex uses the same local 32768-token context budget, 8192-token response reserve and 80-message retention as the other processors. The reserve controls local input trimming; it does not impose a CLI output-token limit. CLI internal instructions are outside that estimate. Tests exercise configuration, routing and subprocess handling offline; live account/model access has not been tested.
+
+`--provider claude` selects the configured Claude variants: Opus in the base preset, and Haiku, Sonnet and Opus in the larger presets. The Fable processor remains available for custom configurations. Haiku, Sonnet and Opus use the corresponding Claude Code aliases; Fable uses `claude-fable-5-1`. All four share the same 32768-token context budget, 8192-token output reserve, 80-message retention and conversation guides. Claude Code must be authenticated with access to each selected model. Configuration and routing are tested offline; account access is not implied.
 
 
-All agents retain at most 30 conversation messages: the first received event plus up to 29 recent events, counting their own replies too. System instructions and private persona fields are separate. This setting takes effect on the next agent launch.
+All agents retain at most 80 conversation messages: the first received event plus up to 79 recent events, counting their own replies too. The shared context budget can evict older messages before that count is reached. System instructions and private persona fields are separate. This setting takes effect on the next agent launch.
 
 
 The shared behaviour allows reactions as short as one word, incomplete sentences, direct disagreement and context-appropriate changes in length. It sets no word quota, greeting routine or mandatory politeness. Context continuity, attribution, private-persona constraints and factual grounding remain explicit. The final turn guide is intentionally short rather than repeating a detailed conversational script. Existing agents load revised instructions on restart.
@@ -174,9 +179,9 @@ The shared behaviour allows reactions as short as one word, incomplete sentences
 
 ### Sampling preset (2026-09-09)
 
-Qwen uses temperature 0.9 (previously 0.6), top_p 0.95 and top_k 50 (previously 20). Gemma uses temperature 1.1 (previously 1.0), top_p 0.95 and top_k 80 (previously 64). Both now send repetition_penalty 1.05, a mild penalty on tokens already present in the prompt or output. Small and large sizes share the same family preset. This is an experimental diversity setting, not a demonstrated quality improvement; higher randomness can also reduce coherence. The 30-message history and disabled thinking are unchanged.
+Qwen uses temperature 0.9 (previously 0.6), top_p 0.95 and top_k 50 (previously 20). Gemma uses temperature 1.1 (previously 1.0), top_p 0.95 and top_k 80 (previously 64). Both now send repetition_penalty 1.05, a mild penalty on tokens already present in the prompt or output. Small and large sizes share the same family preset. This is an experimental diversity setting, not a demonstrated quality improvement; higher randomness can also reduce coherence. This sampling change preserved the then-current 30-message history and disabled thinking. Retention was subsequently increased to 80 messages on 2026-09-12.
 
-The installed Claude Code CLI exposes no sampling temperature/top-p/repetition-penalty flags, so the four Claude variants retain the CLI's sampling behavior. Changing Claude effort is not a replacement for sampling temperature. See [Featherless sampling parameters](https://featherless.ai/docs/completions) for API semantics. Restart existing agents to apply the new processor defaults.
+The installed Claude Code CLI exposes no sampling temperature/top-p/repetition-penalty flags, so the four Claude variants retain the CLI's sampling behavior. All Claude variants explicitly pass `--effort medium` to the CLI. Changing Claude effort is not a replacement for sampling temperature. See [Featherless sampling parameters](https://featherless.ai/docs/completions) for API semantics. Restart existing agents to apply the new processor defaults.
 
 
-Context check with the current 697-word behaviour and the supplied welcome (2026-09-09): the largest configured profile plus system/turn instructions and welcome uses 7140 units of the runner's conservative UTF-8-byte estimate. The 32768-token window reserves 8192 for output and 512 for framing, leaving an input budget of 24064. This is not an exact tokenizer count. With 29 additional synthetic 500-character ASCII messages, all 30 events fit (estimate 21814); with 1000-character messages, context eviction reduces the retained count below 30. The first event stays pinned. Claude Code's additional internal prompt is outside this local estimate.
+Historical context check with the then-current 697-word behaviour and the supplied welcome (2026-09-09, before the behaviour additions and 80-message retention): the largest configured profile plus system/turn instructions and welcome uses 7140 units of the runner's conservative UTF-8-byte estimate. The 32768-token window reserves 8192 for output and 512 for framing, leaving an input budget of 24064. This is not an exact tokenizer count. With 29 additional synthetic 500-character ASCII messages, all 30 events fit (estimate 21814); with 1000-character messages, context eviction reduces the retained count below 30. The first event stays pinned. Claude Code's additional internal prompt is outside this local estimate.

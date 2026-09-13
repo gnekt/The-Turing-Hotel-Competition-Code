@@ -12,7 +12,7 @@ from utils import (
 class OpusAgent:
     def __init__(self, personas: str, effort: str):
         self.conversation = Conversation(
-            keep=30,
+            keep=80,
             context_window_tokens=model_context_tokens("Claude Opus"),
             response_reserve_tokens=EXPERIMENT_RESPONSE_RESERVE_TOKENS,
             system_prompt=budgeted_system_prompt(personas),

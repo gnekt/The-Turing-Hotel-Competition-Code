@@ -63,7 +63,7 @@ class QwenAgent:
     def __init__(self, personas: str, effort: str, api_key: str,
                  model: str = "Qwen/Qwen3.5-2B", cost: int = 1):
         self.conversation = Conversation(
-            keep=30,
+            keep=80,
             context_window_tokens=model_context_tokens(model),
             response_reserve_tokens=MAX_OUTPUT_TOKENS,
             system_prompt=budgeted_system_prompt(personas),

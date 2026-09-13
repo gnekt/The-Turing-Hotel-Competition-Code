@@ -28,9 +28,10 @@ FEATHERLESS_KEY_FILENAMES = (
     "featherles_keys",
     "featherless_keys.txt",
 )
-from utils import CLAUDE_MODEL_SELECTORS
+from utils import CLAUDE_MODEL_SELECTORS, CODEX_MODEL_SELECTORS
 
 DEFAULT_MODEL_IDS = {
+    **CODEX_MODEL_SELECTORS,
     "Gemma 4 31B": "google/gemma-4-31B-it",
     "Gemma 4 E2B": "google/gemma-4-E2B-it",
     "Qwen 3.5 27B": "Qwen/Qwen3.5-27B",
@@ -153,6 +154,7 @@ def run_agent(config, featherless_key, unaiverse_key):
     from processors.sonnet import SonnetAgent
     from processors.fable import FableAgent
     from processors.qwen import QwenAgent
+    from processors.codex import CodexAgent
     from prompts import build_system_prompt
 
     llm = config["llm"]
@@ -176,6 +178,10 @@ def run_agent(config, featherless_key, unaiverse_key):
             model=model_id or "Qwen/Qwen3.5-2B",
             cost=int(cost_value or 1),
         )
+    elif llm in CODEX_MODEL_SELECTORS:
+        if model_id != CODEX_MODEL_SELECTORS[llm]:
+            raise ValueError(f"Unsupported Codex model ID for {llm}: {model_id}")
+        processor = CodexAgent(prompt, "medium", model=model_id)
     elif llm in CLAUDE_MODEL_SELECTORS:
         classes = {"Claude Haiku": HaikuAgent, "Claude Sonnet": SonnetAgent,
                    "Claude Opus": OpusAgent, "Claude Fable": FableAgent}
@@ -309,6 +315,8 @@ def restart_agent(config, featherless_key, unaiverse_key, setup_file=SETUP_FILE)
 def select_configs(configs, provider, agents=None):
     if provider == "claude":
         configs = [config for config in configs if config["llm"].startswith("Claude")]
+    elif provider == "codex":
+        configs = [config for config in configs if config["llm"] in CODEX_MODEL_SELECTORS]
     elif provider == "featherless":
         configs = [config for config in configs if config["featherless_model_key"] != "NA"]
     if not configs:
@@ -384,6 +392,7 @@ def configure_interactively(args):
         ("all", "All providers"),
         ("claude", "Claude only"),
         ("featherless", "Featherless only"),
+        ("codex", "Codex only"),
     ], default=args.provider)
     return args.provider is not None
 
@@ -441,6 +450,9 @@ def execute(args):
         keys = load_featherless_keys(resolve_featherless_keys(args.featherless_keys_file))
 
     # Validate every selected credential and identity before stopping any agent.
+    if any(config["llm"] in CODEX_MODEL_SELECTORS for config in configs):
+        if shutil.which("codex") is None:
+            raise ValueError("Codex CLI is required for Codex agents; install it and run codex login")
     for config in configs:
         featherless_key_for(config, keys)
         node_name_for(config)
@@ -480,7 +492,7 @@ def main(argv=None):
     )
     parser.add_argument(
         "--provider",
-        choices=("claude", "featherless", "all"),
+        choices=("claude", "featherless", "codex", "all"),
         default="all",
         help="which agents to manage; defaults to all",
     )

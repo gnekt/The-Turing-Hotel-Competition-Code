@@ -9,6 +9,7 @@ import time
 from collections import namedtuple
 from pathlib import Path
 import subprocess
+import tempfile
 
 
 EVENT_SEPARATOR = "\x1e"
@@ -34,6 +35,11 @@ DEFAULT_RESET_RULES = (reset_on_phrase,)
 
 EXPERIMENT_CONTEXT_TOKENS = 32_768
 EXPERIMENT_RESPONSE_RESERVE_TOKENS = 8_192
+CODEX_MODEL_SELECTORS = {
+    "Codex Sol": "gpt-5.6-sol",
+    "Codex Terra": "gpt-5.6-terra",
+    "Codex Luna": "gpt-5.6-luna",
+}
 MODEL_CONTEXT_TOKENS = {
     # One common ceiling prevents context capacity from becoming an additional
     # model-family confound. It is the largest value supported by every runtime.
@@ -45,6 +51,7 @@ MODEL_CONTEXT_TOKENS = {
     "Claude Haiku": EXPERIMENT_CONTEXT_TOKENS,
     "Claude Sonnet": EXPERIMENT_CONTEXT_TOKENS,
     "Claude Fable": EXPERIMENT_CONTEXT_TOKENS,
+    **{model: EXPERIMENT_CONTEXT_TOKENS for model in CODEX_MODEL_SELECTORS.values()},
 }
 CONTEXT_TEMPLATE_RESERVE_TOKENS = 512
 
@@ -419,6 +426,43 @@ CLAUDE_MODEL_SELECTORS = {
 }
 
 
+def call_codex_prompt(input: str, model: str, effort: str = "medium", timeout: int = 300) -> str:
+    """Run one fresh CLI turn; only the final answer becomes a chat message."""
+    if model not in CODEX_MODEL_SELECTORS.values():
+        raise ValueError(f"Unsupported Codex model ID: {model}")
+    if effort not in ("none", "low", "medium", "high", "xhigh", "max"):
+        raise ValueError(f"Unsupported Codex reasoning effort: {effort}")
+    with tempfile.TemporaryDirectory(prefix="turing-codex-") as directory:
+        output = Path(directory) / "answer.txt"
+        cmd = [
+            "codex", "exec", "--model", model,
+            "--ephemeral", "--ignore-user-config", "--skip-git-repo-check",
+            "--sandbox", "read-only", "--color", "never",
+            "-c", f'model_reasoning_effort="{effort}"',
+            "-c", 'approval_policy="never"',
+            "-c", 'web_search="disabled"',
+            "-c", "features.shell_tool=false",
+            "-c", "project_doc_max_bytes=0",
+            "--output-last-message", str(output), "-",
+        ]
+        try:
+            proc = subprocess.run(
+                cmd, input=input, capture_output=True, text=True,
+                timeout=timeout, check=False, cwd=directory,
+            )
+        except (OSError, subprocess.TimeoutExpired) as error:
+            # TimeoutExpired can contain the prompt; do not expose it in logs.
+            raise RuntimeError(f"codex execution failed: {type(error).__name__}") from error
+        if proc.returncode != 0:
+            raise RuntimeError(f"codex exit {proc.returncode}")
+        if not output.is_file():
+            raise RuntimeError("codex returned no final answer")
+        answer = output.read_text(encoding="utf-8").strip()
+        if not answer:
+            raise RuntimeError("codex returned an empty final answer")
+        return answer
+
+
 def call_claude_prompt(input: str, model: str = "sonnet", effort: str = "medium", timeout: int = 300) -> str:
     
     cmd = [
@@ -426,6 +470,7 @@ def call_claude_prompt(input: str, model: str = "sonnet", effort: str = "medium"
         "-p",                   
         "--output-format", "json",    
         "--model", model,
+        "--effort", effort,
         "--max-turns", "1",            
     ]
 
